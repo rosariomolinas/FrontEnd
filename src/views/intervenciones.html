@@ -1,0 +1,500 @@
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <script src="public/functions/jquery.js"></script>
+	<script src="public/functions/jquery-ui.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+  <title>Robiotics</title>
+  <style>
+    .borde {
+      border: 1px solid black;
+    }
+    </style>
+</head>
+
+<body>
+  <script src="https://kit.fontawesome.com/e7616adc48.js" crossorigin="anonymous"></script>
+
+
+  <div id="includeheader"></div>
+  
+
+  <div class="mb-3">
+    <button class="button mt-2 mb-2 color1" id="find" onclick="loadonepac();"><i class="fa-solid fa-find fa-1x color1" ></i>Buscar</button> 
+    <label for="exampleFormControlInput1" class="form-label">Paciente:</label>
+    <label for="exampleFormControlInput1" id="nombpaciente" class="form-label"></label>
+   
+  </div>
+
+  
+  <div class="mb-3">
+    <button class="button mt-2 mb-2 color1" id="find" onclick="loadonedoc();"><i class="fa-solid fa-find fa-1x color1" ></i>Buscar</button> 
+    <label for="exampleFormControlInput1" class="form-label">Doctor:</label>
+    <label for="exampleFormControlInput1" id="nombdoctor" class="form-label"></label>
+   
+  </div>
+
+  <label for="presupDate">Fecha Presupuesto:</label>
+<input id="presupDate" class="form-control" type="date" />
+<label for="intervDate">Fecha Intervención:</label>
+<input id="intervDate" class="form-control" type="date" />
+
+<br>
+<div id="divtabruta" class="container text-center">
+  <div class="row align-items-start ">
+    <div class="col bg-info col-3 borde">
+      Órgano
+    </div>
+    <div class="col bg-info col-2 borde">
+      Tejido
+    </div>
+    <div class="col bg-info col-2 borde">
+      Sangre
+    </div>
+    <div class="col bg-info col-2 borde">
+      Tomografía
+    </div>
+    <div class="col bg-info col-3 borde">
+      Medicación
+    </div>
+  </div>
+  
+</div>
+
+
+<button id="rutaadd" onclick="rutaadd()" >Ruta +</button>
+<button id="rutaadd" onclick="presup()" >Presupuestar</button>
+
+
+<div id="container">
+
+
+</div>
+
+
+</body>
+    
+<script>
+
+function presup()
+{
+  /* Validate */
+  
+  /* 0 - Cargar Paciente, doctor y fechas */
+
+  /* 1 - Organos repetidos */
+ 
+  valido = true;
+  valido1 = true;
+  cantMed = 0;
+  vorg = $("[id^=selOrgano]");
+  vfilas = $("[id^=fila]");
+  repOrg = [];
+  for(i=0; i<vorg.length; i++)
+ { 
+   if (repOrg.includes(vorg[i].value))
+   {
+      valido = false
+    }
+    repOrg.push(vorg[i].value);   
+
+    /* tejido */
+    if (vfilas[i].children[1].children[0].checked)
+    {
+      let obj = listOrganos.find(o => o.code == vorg[i].value);
+      if (! obj.mtejido)
+      {
+        valido1 = false
+      }
+    }
+    /* sangre */
+    if (vfilas[i].children[2].children[0].checked)
+    {
+      let obj = listOrganos.find(o => o.code == vorg[i].value);
+      if (! obj.msangre)
+      {
+        valido1 = false
+      }
+    }
+    /* tomografía */
+    if (vfilas[i].children[3].children[0].checked)
+        {
+          let obj = listOrganos.find(o => o.code == vorg[i].value);
+          if (! obj.tomo3d)
+          {
+            valido1 = false
+          }
+    }
+   /* contar medicamentos */
+   if (! (vfilas[i].children[4].children[0].value === '0'))
+   {
+     cantMed ++
+
+   }
+
+ }
+ alert(valido);
+ alert(valido1);
+ alert(cantMed);
+  /* 2 - Intervenciones permitidas */
+
+
+  /* 3 - Máximo 2 medicamentos */
+
+
+}
+
+function rutaadd()
+{
+  /* busca los órganos y arma un combo */
+  jstring = '{}';
+    
+	
+
+tabruta = $("#divtabruta")[0];
+//Create a DropDownList element.
+var ddlCustomers = document.createElement("SELECT");
+ddlCustomers.setAttribute("id", "selOrgano");
+for(i=0; i< listOrganos.length; i++)
+{
+      //Add the Options to the DropDownList.
+      var option = document.createElement("OPTION");
+
+      //Set Customer Name in Text part.
+      option.innerHTML = listOrganos[i].nombre;
+
+      //Set CustomerId in Value part.
+      option.value = listOrganos[i].code;
+
+      //Add the Option element to DropDownList.
+      ddlCustomers.options.add(option);
+
+}
+
+var row = document.createElement("div");
+row.setAttribute("id", "fila");
+
+row.className="row align-items-start borde";
+var cell = document.createElement("div");
+cell.className="col col-3 ";
+cell.appendChild(ddlCustomers);
+row.appendChild(cell);
+
+var checkbox = document.createElement('input');
+checkbox.type = 'checkbox';
+checkbox.className = "form-check-input mb-2"
+checkbox.checked = false;
+var cell2 = document.createElement("div");
+cell2.className="col col-2 borde ";
+cell2.appendChild(checkbox);
+row.appendChild(cell2);
+
+var checkbox = document.createElement('input');
+checkbox.type = 'checkbox';
+checkbox.className = "form-check-input mb-2"
+checkbox.checked =false;
+var cell3 = document.createElement("div");
+cell3.className="col col-2  borde";
+cell3.appendChild(checkbox);
+row.appendChild(cell3);
+
+var checkbox = document.createElement('input');
+checkbox.type = 'checkbox';
+checkbox.className = "form-check-input mb-2"
+checkbox.checked = false;
+var cell4 = document.createElement("div");
+cell4.className="col col-2  borde";
+cell4.appendChild(checkbox);
+row.appendChild(cell4);
+
+
+                      
+            var ddlMedica = document.createElement("SELECT");
+            var option = document.createElement("OPTION");
+
+            option.innerHTML = "";
+            option.value = 0;
+            ddlMedica.options.add(option);
+            ddlMedica.setAttribute("id", "selMedicamento");
+            for(i=0; i< listMedicamentos.length; i++)
+            {
+                  //Add the Options to the DropDownList.
+                  var option = document.createElement("OPTION");
+
+                  //Set Customer Name in Text part.
+                  option.innerHTML = listMedicamentos[i].nombre;
+
+                  //Set CustomerId in Value part.
+                  option.value = listMedicamentos[i].code;
+
+                  //Add the Option element to DropDownList.
+                  ddlMedica.options.add(option);
+
+            }
+            
+            var cell6 = document.createElement("div");
+            cell6.className="col col-3  ";
+            cell6.appendChild(ddlMedica);
+            row.appendChild(cell6);
+
+
+            tabruta.appendChild(row);
+  
+
+
+
+
+}
+
+
+function clearFields()
+{
+  $('input').each(function(index,data) {
+    $(this).val('');
+
+  });
+}
+
+function add()
+  {
+   
+    var formObj = $("#FORMDATA");
+    var formData = new FormData(formObj[0]);
+    first = 0;
+    jstring = '{';
+    for (var pair of formData.entries()) 
+    {
+      if (first)
+         jstring = jstring + ', ';
+      console.log(pair[0] + ": " + pair[1]);
+      jstring = jstring +  "\"" + pair[0] + "\" : \"" + pair[1] + "\"";
+      first = 1;
+    }
+    jstring = jstring + '}';
+    console.log(jstring);
+	$.ajax({
+			  url : "./robiotics/pac/addnew",
+			  type : 'POST',
+			  data : jstring,
+        contentType: 'application/json',
+
+			  success : function(json) {
+          $('input').each(function(index,data) {
+    $(this).val(json[this.id]);
+   
+});
+					
+			   },
+			  error : function(xhr, status) {
+					// alert('Disculpe, existió un problema');
+				},
+			  complete : function(xhr, status) {
+			}
+  });
+}
+
+
+  function loadonepac()
+  {
+    let codigo = prompt("Buscar paciente:", "");
+    
+    jstring = '{ "code" : ' + codigo + ' }';
+    console.log(jstring);
+	$.ajax({
+			  url : "./robiotics/pac/findcode",
+			  type : 'POST',
+			  /// processData: false,
+		    /// data: formData, // JSON.stringify(formData), 
+        data : jstring,
+        /// mimeType:'multipart/form-data',
+		    //contentType: 'text/html; charset=UTF-8',
+        /// contentType: false,
+        contentType: 'application/json',
+
+			  success : function(json) {
+          $('#nombpaciente')[0].innerText=json.nombre + " " + json.apellido;
+					
+			   },
+			  error : function(xhr, status) {
+					// alert('Disculpe, existió un problema');
+				},
+			  complete : function(xhr, status) {
+			}
+  });
+}
+
+  
+function loadonedoc()
+  {
+    let codigo = prompt("Buscar doctor:", "");
+    
+    jstring = '{ "code" : ' + codigo + ' }';
+    console.log(jstring);
+	$.ajax({
+			  url : "./robiotics/doctor/findone",
+			  type : 'POST',
+        data : jstring,
+      
+        contentType: 'application/json',
+
+			  success : function(json) {
+          $('#nombdoctor')[0].innerText=json.nombre + " " + json.apellido;
+					
+			   },
+			  error : function(xhr, status) {
+					// alert('Disculpe, existió un problema');
+				},
+			  complete : function(xhr, status) {
+			}
+  });
+}
+
+
+function next()
+  {
+   
+    var formObj = $("#FORMDATA");
+    var formData = new FormData(formObj[0]);
+    first = 0;
+    jstring = '{';
+    for (var pair of formData.entries()) 
+    {
+      if (first)
+         jstring = jstring + ', ';
+      console.log(pair[0] + ": " + pair[1]);
+      jstring = jstring +  "\"" + pair[0] + "\" : \"" + pair[1] + "\"";
+      first = 1;
+    }
+    jstring = jstring + '}';
+    console.log(jstring);
+	$.ajax({
+			  url : "./robiotics/pac/next",
+			  type : 'POST',
+			  /// processData: false,
+		    /// data: formData, // JSON.stringify(formData), 
+        data : jstring,
+        /// mimeType:'multipart/form-data',
+		    //contentType: 'text/html; charset=UTF-8',
+        /// contentType: false,
+        contentType: 'application/json',
+
+			  success : function(json) {
+          json = json[0];
+          $('input').each(function(index,data) {
+            if ($(this)[0].type == 'checkbox')
+          {   
+            $(this).prop('checked', json[this.id]);
+          }
+          else
+          {
+              $(this).val(json[this.id]);
+          } 
+});
+					
+			   },
+			  error : function(xhr, status) {
+					// alert('Disculpe, existió un problema');
+				},
+			  complete : function(xhr, status) {
+			}
+  });
+}
+
+function previous()
+  {
+   
+    var formObj = $("#FORMDATA");
+    var formData = new FormData(formObj[0]);
+    first = 0;
+    jstring = '{';
+    for (var pair of formData.entries()) 
+    {
+      if (first)
+         jstring = jstring + ', ';
+      console.log(pair[0] + ": " + pair[1]);
+      jstring = jstring +  "\"" + pair[0] + "\" : \"" + pair[1] + "\"";
+      first = 1;
+    }
+    jstring = jstring + '}';
+    console.log(jstring);
+	$.ajax({
+			  url : "./robiotics/pac/previous",
+			  type : 'POST',
+			 
+        data : jstring,
+        contentType: 'application/json',
+
+			  success : function(json) {
+          json = json[0];
+          $('input').each(function(index,data) {
+            if ($(this)[0].type == 'checkbox')
+          {   
+            $(this).prop('checked', json[this.id]);
+          }
+          else
+          {
+              $(this).val(json[this.id]);
+          } 
+});
+					
+			   },
+			  error : function(xhr, status) {
+					// alert('Disculpe, existió un problema');
+				},
+			  complete : function(xhr, status) {
+			}
+  });
+}
+
+
+
+$(function(){
+      $("#includeheader").load("./header"); 
+    });
+
+/* load organos y medicamentos */
+listOrganos = {};
+jstring = '{}';
+    
+    $.ajax({
+          url : "./robiotics/org/traertodos",
+          type : 'POST',
+          data : jstring,
+          contentType: 'application/json',
+  
+          success : function(json) {
+          listOrganos = json;
+					
+        },
+       error : function(xhr, status) {
+         // alert('Disculpe, existió un problema');
+       },
+       complete : function(xhr, status) {
+     }
+ });
+
+
+ listMedicamentos = {};
+jstring = '{}';
+    
+    $.ajax({
+          url : "./robiotics/medica/traertodos",
+          type : 'POST',
+          data : jstring,
+          contentType: 'application/json',
+  
+          success : function(json) {
+            listMedicamentos = json;
+					
+        },
+       error : function(xhr, status) {
+         // alert('Disculpe, existió un problema');
+       },
+       complete : function(xhr, status) {
+     }
+ });
+
+
+
+</script>    
