@@ -6,6 +6,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
   <title>Robiotics</title>
+  <link rel="stylesheet" href="./public/styleInterv.css">
   <style>
     .borde {
       border: 1px solid black;
@@ -18,19 +19,17 @@
 
 
   <div id="includeheader"></div>
+  <div id="includemenu"></div>
   
-
   <div class="mb-3">
-    <button class="button mt-2 mb-2 color1" id="find" onclick="loadonepac();"><i class="fa-solid fa-find fa-1x color1" ></i>Buscar</button> 
-    <label for="exampleFormControlInput1" class="form-label">Paciente:</label>
+    <button class="button mt-2 mb-2 color1" id="find" onclick="loadonepac();"><i class="fa-solid fa-find fa-1x color1" ></i>Buscar Paciente</button> 
     <label for="exampleFormControlInput1" id="nombpaciente" class="form-label"></label>
    
   </div>
 
   
-  <div class="mb-3">
-    <button class="button mt-2 mb-2 color1" id="find" onclick="loadonedoc();"><i class="fa-solid fa-find fa-1x color1" ></i>Buscar</button> 
-    <label for="exampleFormControlInput1" class="form-label">Doctor:</label>
+  <div class="mb-4">
+    <button class="button mt-2 mb-2 color1" id="find" onclick="loadonedoc();"><i class="fa-solid fa-find fa-1x color1" ></i>Buscar Medico</button> 
     <label for="exampleFormControlInput1" id="nombdoctor" class="form-label"></label>
    
   </div>
@@ -64,7 +63,7 @@
 
 
 <button id="rutaadd" onclick="rutaadd()" >Ruta +</button>
-<button id="rutaadd" onclick="presup()" >Presupuestar</button>
+<button id="rutapresup" onclick="presup()" >Presupuestar</button>
 
 
 <div id="container">
@@ -72,7 +71,19 @@
 
 </div>
 
+<div class="mb-3">
+  <label for="exampleFormControlInput1" class="form-label">Costo:</label>
+  <label for="exampleFormControlInput1" id="valcosto" class="form-label"></label>
+ 
+</div>
 
+
+<div class="mb-3">
+ 
+  <label for="exampleFormControlInput1" class="form-label">Tiempo:</label>
+  <label for="exampleFormControlInput1" id="valtiempo" class="form-label"></label>
+ 
+</div>
 </body>
     
 <script>
@@ -88,6 +99,8 @@ function presup()
   valido = true;
   valido1 = true;
   cantMed = 0;
+  cost_total = 0;
+  tiempo_total = 0;
   vorg = $("[id^=selOrgano]");
   vfilas = $("[id^=fila]");
   repOrg = [];
@@ -102,6 +115,8 @@ function presup()
     /* tejido */
     if (vfilas[i].children[1].children[0].checked)
     {
+      cost_total = cost_total + listValores.tejido_costo;
+      tiempo_total = tiempo_total = + listValores.tejido_tiempo;
       let obj = listOrganos.find(o => o.code == vorg[i].value);
       if (! obj.mtejido)
       {
@@ -111,6 +126,8 @@ function presup()
     /* sangre */
     if (vfilas[i].children[2].children[0].checked)
     {
+      cost_total = cost_total + listValores.sangre_costo;
+      tiempo_total = tiempo_total = + listValores.sangre_tiempo;
       let obj = listOrganos.find(o => o.code == vorg[i].value);
       if (! obj.msangre)
       {
@@ -120,6 +137,8 @@ function presup()
     /* tomografía */
     if (vfilas[i].children[3].children[0].checked)
         {
+          cost_total = cost_total + listValores.tomo3d_costo;
+          tiempo_total = tiempo_total = + listValores.tomo3d_tiempo;
           let obj = listOrganos.find(o => o.code == vorg[i].value);
           if (! obj.tomo3d)
           {
@@ -137,10 +156,18 @@ function presup()
  alert(valido);
  alert(valido1);
  alert(cantMed);
+ 
+ $("#valcosto")[0].innerText = cost_total;
+ $("#valtiempo")[0].innerText = tiempo_total;
   /* 2 - Intervenciones permitidas */
 
 
   /* 3 - Máximo 2 medicamentos */
+
+
+
+  /* calcular costos y tiempos */
+
 
 
 }
@@ -451,6 +478,7 @@ function previous()
 
 $(function(){
       $("#includeheader").load("./header"); 
+      $("#includemenu").load("./menu"); 
     });
 
 /* load organos y medicamentos */
@@ -464,7 +492,8 @@ jstring = '{}';
           contentType: 'application/json',
   
           success : function(json) {
-          listOrganos = json;
+          listOrganos = json.lista;
+          listValores = json.valores;
 					
         },
        error : function(xhr, status) {
