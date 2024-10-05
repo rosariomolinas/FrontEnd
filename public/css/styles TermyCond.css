@@ -1,0 +1,22 @@
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+</style>
+
+*{
+    padding: 0%;
+    margin: 0%;
+    box-sizing: border-box;
+}
+
+body{
+    font-family: 'Poppins', sans-serif;
+    background-color: lightcoral;
+    background-image: url(./foto\ fondo\ 3.jpeg);
+    color: black;
+}
+/*
+.main-container{
+    width: 330px;
+    margin: 96px auto 40px;
+}
+*/
