@@ -185,10 +185,31 @@
 </div>  
 
 
+
+
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+  <div id="intervToastmsg" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+
+    <div class="toast-body">
+      
+    </div>
+  </div>
+</div>
+
 </body>
     
 <script>
 
+
+
+function showToastMsg (texto)
+{
+   const toastMessage = document.getElementById('intervToastmsg');
+   toastMessage.children[0].innerText = texto;
+   const toast = new bootstrap.Toast(toastMessage)
+   toast.show()
+
+}
 /* PACIENTES */
 /* Cerrar / cancelar ventana de búsqueda */
 function searchPacClose()
@@ -202,14 +223,9 @@ function searchPacClose()
 function pacSelected(t)
 {
   filas = t.children;
-  /*
-  for(i=0; i < filas.length; i++)
-  {
-    $('#' + filas[i].getAttribute("name"))[0] .value = filas[i].getAttribute("valor");
 
-  }
-*/
   $('#nombpaciente')[0].innerText=  filas[1].getAttribute("valor") + " " + filas[2].getAttribute("valor");
+  $('#nombpaciente')[0].setAttribute ("code", filas[0].getAttribute("valor") );
   ventana = $("#pacSearchModal")[0];
   ventana.className= ventana.className.replace("show d-block", "") ;
 }
@@ -221,7 +237,7 @@ function searchShow()
   $("#inpCode")[0].value = '';
   $("#inpNombre")[0].value = '';
   $('#log_message')[0].innerText = '';
-  filas = $("[id^=fila]");
+  filas = $("[id^=pacfila]");
   for(i=filas.length; i > 0; i--)
   {
      filas[i - 1].remove();
@@ -256,7 +272,7 @@ function searchPac()
 
   }
   
-  filas = $("[id^=fila]");
+  filas = $("[id^=pacfila]");
   for(i=filas.length; i > 0; i--)
   {
      filas[i - 1].remove();
@@ -278,7 +294,7 @@ function searchPac()
           for(i=0; i < json.length; i++)
         {
           var row = document.createElement("div");
-          row.setAttribute("id", "fila"+i);
+          row.setAttribute("id", "pacfila"+i);
           row.setAttribute("onclick", "pacSelected(this)");
           row.className="row align-items-start borde";
           var cell1 = document.createElement("div");
@@ -309,7 +325,7 @@ function searchPac()
 
         }
         
-        filas = $("[id^=fila]");
+        filas = $("[id^=pacfila]");
 	
 			   },
 			  error : function(xhr, status) {
@@ -336,6 +352,7 @@ function docSelected(t)
 {
   filas = t.children;
   $('#nombdoctor')[0].innerText=  filas[1].getAttribute("valor") + " " + filas[2].getAttribute("valor");
+  $('#nombdoctor')[0].setAttribute ("code", filas[0].getAttribute("valor") );
   ventana = $("#docSearchModal")[0];
   ventana.className= ventana.className.replace("show d-block", "") ;
 }
@@ -347,7 +364,7 @@ function searchDocShow()
   $("#inpDocCode")[0].value = '';
   $("#inpDocNombre")[0].value = '';
   $('#log_docmessage')[0].innerText = '';
-  filas = $("[id^=fila]");
+  filas = $("[id^=docfila]");
   for(i=filas.length; i > 0; i--)
   {
      filas[i - 1].remove();
@@ -382,7 +399,7 @@ function searchDoc()
 
   }
   
-  filas = $("[id^=fila]");
+  filas = $("[id^=docfila]");
   for(i=filas.length; i > 0; i--)
   {
      filas[i - 1].remove();
@@ -404,7 +421,7 @@ function searchDoc()
           for(i=0; i < json.length; i++)
         {
           var row = document.createElement("div");
-          row.setAttribute("id", "fila"+i);
+          row.setAttribute("id", "docfila"+i);
           row.setAttribute("onclick", "docSelected(this)");
           row.className="row align-items-start borde";
           var cell1 = document.createElement("div");
@@ -435,7 +452,7 @@ function searchDoc()
 
         }
         
-        filas = $("[id^=fila]");
+        filas = $("[id^=docfila]");
 	
 			   },
 			  error : function(xhr, status) {
@@ -482,7 +499,7 @@ function presup()
   cost_total = 0;
   tiempo_total = 0;
   vorg = $("[id^=selOrgano]");
-  vfilas = $("[id^=fila]");
+  vfilas = $("[id^=presfila]");
   repOrg = [];
 
   if ( vfilas.length < 1)
@@ -547,13 +564,69 @@ function presup()
 
 
 }
+
+function confirmar()
+{
+  codePac = $('#nombpaciente')[0].getAttribute("code");
+  codeDoc = $('#nombdoctor')[0].getAttribute("code");
+  fechInt =  $("#intervDate")[0].value;
+  vfilas = $("[id^=presfila]");
+
+  vcosto = $("#valcosto")[0].innerText;
+  vtiempo = $("#valtiempo")[0].innerText;
+  
+  
+
+  // setAttribute ("code", filas[0].getAttribute("valor") );
+  jstring = '{"paciente" : ' + codePac + ', "doctor" : ' + codeDoc + ', "fecint" : "' + fechInt + '" , "costo" : ' + vcosto + ', "tiempo" : ' + vtiempo + ', "ruta" : [' ;
+  //{"organo" : 3, "mtejido" : true}, {"organo" : 1, "mtejido" : false}] }'
+  for(i=0; i < vfilas.length; i++)
+  {
+    if (i)
+    {  
+      jstring = jstring + ', '
+    };
+    jstring = jstring + '{ "organo" : ' + vfilas[i].children[0].children[0].value + ', "mtejido" : ' + vfilas[i].children[1].children[0].checked + 
+                             ', "msangre" : ' + vfilas[i].children[2].children[0].checked  + 
+                             ', "tomo3d"  : ' + vfilas[i].children[3].children[0].checked  + 
+                             ', "medica" :  ' +  vfilas[i].children[4].children[0].value + '}'
+
+  }
+
+  jstring = jstring + '] }';
+// jstring = '{"uno" : 1}'
+  $.ajax({
+			  url : './robiotics/interv/addnew',
+			  type : 'POST',
+			  data : jstring,
+        contentType: 'application/json',
+
+			  success : function(json) {
+
+          mensaje = json.message;
+          showToastMsg(mensaje);
+          
+	
+			   },
+			  error : function(xhr, status) {
+					// alert('Disculpe, existió un problema');
+				},
+			  complete : function(xhr, status) {
+			}
+  });
+  
+
+
+}
+
 let presupValido = false;
 
 function presupNuevo(){
   presupValido = false;
   $("#presupconf")[0].disabled = true;
   $('#err_message')[0].innerHTML = '';
-
+  $("#valcosto")[0].innerText = '';
+  $("#valtiempo")[0].innerText = '';
 }
 
 function statuschg(th)
@@ -607,7 +680,7 @@ for(i=0; i< listOrganos.length; i++)
 }
 
 var row = document.createElement("div");
-row.setAttribute("id", "fila");
+row.setAttribute("id", "presfila");
 
 row.className="row align-items-start borde";
 var cell = document.createElement("div");
