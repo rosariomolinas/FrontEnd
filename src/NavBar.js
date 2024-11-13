@@ -44,6 +44,12 @@ const NavBar = () => {
           <div class="col-1">
             <NavLink to="/intervenciones">Intervenciones</NavLink>
           </div>
+          <div class="col-1"> 
+            <NavLink to="/organos">Órganos</NavLink>
+          </div>
+          <div class="col-1"> 
+            <NavLink to="/doctores">Doctores</NavLink>
+          </div>
           <div class="col-4">
 
           </div>

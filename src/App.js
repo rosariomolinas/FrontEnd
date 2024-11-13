@@ -6,6 +6,8 @@ import React, { Component } from "react";
 //import Home from './Pages/Home';
 import Login  from './Login';
 import Pacientes from './Pacientes';
+import Organos from './Organos';
+import Doctores from './Doctores';
 import Intervenciones from './Intervenciones';
 import ChangePass from './ChangePass';
 
@@ -52,6 +54,8 @@ class  App extends Component {
                   <Routes>
                      <Route path="/pacientes" element={ <Pacientes vtoken = {this.state.token}/>} />
                      <Route path="/intervenciones" element={<Intervenciones vtoken = {this.state.token} />} />
+                     <Route path="/doctores" element={<Doctores />} />
+                     <Route path="/organos" element={<Organos />} />
                      <Route path="/logout" element={<Login />} />
                      <Route path="/passchange" element={<ChangePass />} />
                   </Routes>
