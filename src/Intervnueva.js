@@ -1,4 +1,4 @@
-// Intervenciones.js
+// Intervnueva.js
 
 import { React, useState } from "react"
 import Toast from 'react-bootstrap/Toast';
@@ -7,7 +7,7 @@ import ToastContainer from 'react-bootstrap/ToastContainer';
 
 
 
-const Intervenciones = (props) => {
+const Intervnueva = (props) => {
 
     
     const [codpaciente, setCodpaciente] = useState(0)  
@@ -978,4 +978,4 @@ async function    handleOnChangeDocActivo(e){
            );
  }
 
-export default Intervenciones;
+export default Intervnueva;

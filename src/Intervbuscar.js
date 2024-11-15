@@ -1,4 +1,4 @@
-// Intervenciones.js
+// Intervbuscar.js
 
 import { React, useState } from "react"
 import Toast from 'react-bootstrap/Toast';
@@ -7,7 +7,7 @@ import ToastContainer from 'react-bootstrap/ToastContainer';
 
 
 
-const Intervenciones = (props) => {
+const Intervbuscar = (props) => {
 
     
     const [codpaciente, setCodpaciente] = useState(0)  
@@ -45,10 +45,8 @@ const Intervenciones = (props) => {
     const [presupTiempo, setPresupTiempo] = useState(0)
 
 
-      
-
-    //const [intervGrilla, setIntervGrilla] = useState({"organo": "corazon", "tejido" : true, "sangre" : true}, {  "organo": "corazon", "tejido" :false, "sangre" : true})  
     const [intervGrilla, setIntervGrilla] = useState([])  
+    const [intervDetailGrilla, setIntervDetailGrilla] = useState([])  
 
 
 
@@ -69,7 +67,166 @@ async function handleModel(e){
         
     }
  }
+ async function handleVerDetalle(e, inx){
+  e.preventDefault()
 
+
+  try {
+    // la primera vez, cargo los organos
+    if (!listOrganos.length)
+    {
+      console.log("2")
+      var jstring;
+      var url;
+      
+      jstring = '{}';
+              url = "http://localhost:8080/robiotics/org/traertodos";
+
+          /* fetch de búsqueda */
+          var options = {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json'
+            },
+            mode: 'cors',
+            credential : 'include',
+            body:  jstring,
+            //JSON.stringify({"code" : 4, "activo" : true}),
+            
+            };
+          
+          fetch(url, options)
+          .then( response => response.json())
+          .then( data => {
+              console.log(data.lista)
+              if ( data.lista.length)
+              {
+                setListOrganos(data.lista);
+                setOrgValores(data.valores);
+              }          
+            
+          })
+        }   
+          
+     // la primera vez, cargo los medicamentos
+     if (!listMedica.length)
+      {
+        
+        var jstring1;
+        var url1;
+        
+        jstring1 = '{}';
+                url1 = "http://localhost:8080/robiotics/medica/traertodos";
+  
+            /* fetch de búsqueda */
+            var options1 = {
+              method: 'POST',
+              headers: {
+              'Content-Type': 'application/json'
+              },
+              mode: 'cors',
+              credential : 'include',
+              body:  jstring1,
+              //JSON.stringify({"code" : 4, "activo" : true}),
+              
+              };
+            
+            fetch(url1, options1)
+            .then( response => response.json())
+            .then( data => {
+                console.log(data)
+                if ( data.length)
+                {
+                  setListMedica(data);
+            
+                }          
+              
+            })
+          }       
+   
+    /*setIntervGrilla (intervGrilla => [...intervGrilla, {"organo": listOrganos[0].code, "mtejido" : false, "mtejidovis" : listOrganos[0].mtejido, 
+               "msangre" : false, "msangrevis" : listOrganos[0].msangre, "tomo3d" : false, "tomo3dvis" : listOrganos[0].tomo3d, "medica" : 0}]);
+    */
+  } 
+     
+  catch (error) {
+      console.log(error);
+      
+  }
+
+
+  console.log(intervGrilla, intervGrilla[inx].ruta)
+  var nvoDetail = []
+  intervGrilla[inx].ruta.map  (( unolista, index ) => {
+
+   nvoDetail.push(unolista);
+  });
+  setIntervDetailGrilla(nvoDetail)
+  try {
+     var json = ""
+  } catch (error) {
+      console.log(error);
+      
+  }
+}
+/* Handle de evento modelo */
+async function handleSearchInterv(e){
+  var jstring;
+  var url;
+  e.preventDefault()
+  try {
+
+        jstring = '{ '
+        if (codpaciente != 0)
+        {
+          jstring = jstring + '"paciente" : ' + codpaciente
+        }
+        if (coddoctor != 0)
+          {
+            jstring = jstring + '"doctor" : ' + coddoctor
+          }
+        //        "code" : "' + searchDoccodigo +  '", "token" : "' + props.vtoken + '", ' + msgactivo +  '}';
+        jstring = jstring + '}';   
+        console.log(jstring);
+        url = "http://localhost:8080/robiotics/interv/traeralgunos";
+      
+    
+      
+
+
+
+/* fetch de búsqueda */
+var options = {
+  method: 'POST',
+  headers: {
+  'Content-Type': 'application/json'
+  },
+  mode: 'cors',
+  credential : 'include',
+  body:  jstring,
+  
+  };
+
+fetch(url, options)
+.then( response => response.json())
+.then( data => {
+  console.log(data.lista);
+  setIntervGrilla(data.lista);
+    if (! data.lista.length)
+    {
+      setSearchDocMessage("No hay coincidencias");
+
+    }          
+  
+})
+
+
+  } catch (error) {
+      console.log(error);
+      
+  }
+
+}
  /* e.taget.value es la fila de la grilla -- inx es el elemento */ 
  async function  handleOrganoChange(e, inx){
   e.preventDefault()
@@ -698,6 +855,13 @@ async function    handleOnChangeDocActivo(e){
       </div>
     </div>
    
+
+    <div class="row align-items-start mb-2">
+      <div class="col col-3 borde">
+        <button type="button" class="btn btn-info" id="find" onClick={handleSearchInterv} disabled={!noteditable} >Buscar Intervenciones</button>
+      </div>
+      
+    </div>
   </div>
   
 
@@ -706,6 +870,64 @@ async function    handleOnChangeDocActivo(e){
 
 
 
+
+
+<div id="divtabruta" class="container text-center mb-3">
+  <div class="row align-items-start mb-2 ">
+    <div class="col bg-info col-2 borde">
+      Fecha
+    </div>
+    <div class="col bg-info col-1 borde">
+      Doctor
+    </div>
+    <div class="col bg-info col-1 borde">
+      Paciente
+    </div>
+    <div class="col bg-info col-1 borde">
+      Costo
+    </div>
+    <div class="col bg-info col-1 borde">
+      Tiempo
+    </div>
+    <div class="col bg-info col-3 borde">
+      &nbsp;
+    </div>
+  </div>
+  
+  {  intervGrilla.map (( unolista, index ) => (
+                    <>
+                    <div class="row align-items-start borde-primary mb-2" >
+                      
+                      <div key={index+'_1te'} class="col col-2 border-primary"> {unolista.fecint.substring(0,10)}
+                        
+                        
+                      </div>
+                      <div key={index+'_1sa'} class="col col-1 border-primary">  {unolista.doctor}
+                         
+                      </div>
+                      <div key={index+'_1to'} class="col col-1 border-primary">  {unolista.paciente}
+                         
+                      </div>
+                      <div key={index+'_1to'} class="col col-1 border-primary">  {unolista.costo}
+                         
+                      </div>
+                      <div key={index+'_1to'} class="col col-1 border-primary">  {unolista.tiempo}
+                         
+                      </div>
+                      <div key={index+'_1bo'} class="col col-3 border-primary"> <button type="button" class="btn btn-primary" id="verdetalle" onClick={(evt) => handleVerDetalle(evt, index)} >Ver detalle</button>
+                      </div> 
+
+                    </div>
+            
+                   </>
+
+
+                  ))} 
+
+
+
+
+</div>
 
 
 <div id="divtabruta" class="container text-center mb-3">
@@ -730,28 +952,28 @@ async function    handleOnChangeDocActivo(e){
     </div>
   </div>
   
-  {  intervGrilla.map (( unolista, index ) => (
+  {  intervDetailGrilla.map (( unolista, index ) => (
                     <>
                     <div class="row align-items-start borde-primary mb-2" >
-                      <div key={index+'_1o'} class="col col-2 border-primary"> 
+                      <div key={index+'_2o'} class="col col-2 border-primary"> 
                           <select name="organos" onChange={(evt) => handleOrganoChange(evt, index)} value= {unolista.organo}>
                               {listOrganos.map((e, key) => {
                                   return <option key={key} value={e.code}>{e.nombre}</option>;
                               })}
                           </select>
                        </div>
-                      <div key={index+'_1te'} class="col col-1 border-primary">  {unolista.mtejidovis ?  <input type="checkbox" class="form-check-input" onChange={(evt) => handleOnChangeChecked(evt, index, 1)} checked={unolista.mtejido} /> : ''}  
+                      <div key={index+'_2te'} class="col col-1 border-primary">  <input type="checkbox" class="form-check-input" disabled checked={unolista.mtejido} />   
                         
                         
                         
                       </div>
-                      <div key={index+'_1sa'} class="col col-1 border-primary">  {unolista.msangrevis ?  <input type="checkbox" class="form-check-input" onChange={(evt) => handleOnChangeChecked(evt, index, 2)} checked={unolista.msangre} /> : ''}  
+                      <div key={index+'_2sa'} class="col col-1 border-primary"> <input type="checkbox" class="form-check-input" disabled checked={unolista.msangre} />  
                          
                       </div>
-                      <div key={index+'_1to'} class="col col-1 border-primary">  {unolista.tomo3dvis ?  <input type="checkbox" class="form-check-input" onChange={(evt) => handleOnChangeChecked(evt, index, 3)} checked={unolista.tomo3d} /> : ''}  
+                      <div key={index+'_2to'} class="col col-1 border-primary"> <input type="checkbox" class="form-check-input" disabled cecked={unolista.tomo3d} /> 
                          
                       </div>
-                      <div key={index+'_1me'} class="col col-2 border-primary"> 
+                      <div key={index+'_2me'} class="col col-2 border-primary"> 
                           <select name="medicas" onChange={(evt) => handleMedicaChange(evt, index)} value= {unolista.medica}>
                               <option key={0} selected value={0}> </option>
                               {listMedica.map((e, key) => {
@@ -760,8 +982,6 @@ async function    handleOnChangeDocActivo(e){
                           </select>
                        </div>
 
-                       <div key={index+'_1bo'} class="col col-1 border-primary"> <button type="button" class="btn btn-primary" id="removerow" onClick={(evt) => handleEliminar(evt, index)} >Eliminar</button>
-                      </div> 
                     </div>
             
                    </>
@@ -774,53 +994,6 @@ async function    handleOnChangeDocActivo(e){
 
 </div>
 
-<div id="divtabcampos" class="container text-center mb-3">
-    <div class="row align-items-start mb-2">
-      <div class="col col-2 borde">
-         <button type="button" class="btn btn-primary" id="rutaadd" onClick={handleaddRuta} >Ruta +</button>
-      </div>
-      <div class="col col-2 borde">
-         <button type="button" class="btn btn-primary" id="presup" onClick={handlePresup} >Presupuestar</button>
-      </div>
-      <div class="col col-2 borde">
-         <button type="button" class="btn btn-primary" id="presconfirm" onClick={handleConfirm} >Confirmar</button>
-      </div>
-    </div>
-
-    <div class="row align-items-start mb-2">
-      <div class="col col-2 borde">
-        <label for="exampleFormControlInput1" class="form-label">Costo:</label>
-      </div>
-      <div class="col col-2 borde">
-         <label for="exampleFormControlInput1" id="valcosto" class="form-label">{presupCosto}</label>
-      </div>
-    </div>
-    <div class="row align-items-start mb-2">
-      <div class="col col-2 borde">
-      <label for="exampleFormControlInput1" class="form-label">Tiempo:</label>
-      </div>
-      <div class="col col-2 borde">
-      <label for="exampleFormControlInput1" id="valtiempo" class="form-label">{presupTiempo}</label>
-      </div>
-    </div>
-
-    <div class="row align-items-start mb-2">
-       <div class="col col-3 borde align-items-start text-danger">
-          
-
-          {  presupErrMessage.map (( unolista ) => (
-                    <>
-                      <label id="err_message">{unolista}</label>
-            
-                   </>
-
-
-                  ))} 
-
-
-    </div>
-   
-  </div>
   
 
 
@@ -888,7 +1061,6 @@ async function    handleOnChangeDocActivo(e){
 
 
     </div>
-  </div>
   </div>
   </div>
 
@@ -978,4 +1150,4 @@ async function    handleOnChangeDocActivo(e){
            );
  }
 
-export default Intervenciones;
+export default Intervbuscar;

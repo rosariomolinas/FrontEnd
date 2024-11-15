@@ -8,7 +8,8 @@ import Login  from './Login';
 import Pacientes from './Pacientes';
 import Organos from './Organos';
 import Doctores from './Doctores';
-import Intervenciones from './Intervenciones';
+import Intervnueva from './Intervnueva';
+import Intervbuscar from './Intervbuscar';
 import ChangePass from './ChangePass';
 
 class  App extends Component {
@@ -23,13 +24,18 @@ class  App extends Component {
    newToken = (newToken) => {
       this.setState({ token : newToken})
    }
+
+   getProfile = (getProfile) => {
+      this.setState({ profile : getProfile})
+   }
+
    render() {
 
        if (this.state.token === "")
          {
            return ( 
             <>
-            <Login newToken={ this.newToken }/>
+            <Login newToken={ this.newToken } getProfile={this.getProfile}/>
             </>
             );
    
@@ -50,10 +56,11 @@ class  App extends Component {
       <link rel="stylesheet" href="./../public/css/styleMain.css"/>
       <link rel="icon" href="./../public/images/fotologo.jpg"/> 
   </head>
-               <NavBar />
+               <NavBar vprofile = {this.state.profile}/>
                   <Routes>
                      <Route path="/pacientes" element={ <Pacientes vtoken = {this.state.token}/>} />
-                     <Route path="/intervenciones" element={<Intervenciones vtoken = {this.state.token} />} />
+                     <Route path="/intervnueva" element={<Intervnueva vtoken = {this.state.token} />} />
+                     <Route path="/intervbuscar" element={<Intervbuscar vtoken = {this.state.token} />} />
                      <Route path="/doctores" element={<Doctores />} />
                      <Route path="/organos" element={<Organos />} />
                      <Route path="/logout" element={<Login />} />

@@ -33,6 +33,7 @@ function Login(props) {
              if(data.data)
              {
               props.newToken(data.token);
+              props.getProfile(data.profile);
               navigate('/')
              }
              else

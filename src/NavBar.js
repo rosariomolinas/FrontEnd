@@ -1,11 +1,36 @@
 // component/NavBar.js
-
+import { React, useState } from "react"
 import { NavLink } from "react-router-dom";
 import Dropdown from 'react-bootstrap/Dropdown';
 
 
+const NavBar = (props) => {
 
-const NavBar = () => {
+ 
+  var m1;
+  var m2;
+  var m3;
+  var m4;
+  if(props.vprofile === "user")
+  {
+    //m1 = <NavLink to="/pacientes">Pacientes</NavLink>
+    //m2 = <NavLink to="/intervenciones">Intervenciones</NavLink>
+    m1 = <Dropdown.Item to="/pacientes"> <NavLink to="/pacientes">Pacientes</NavLink></Dropdown.Item>
+    m2 = ""
+    m3 = <Dropdown.Item><NavLink to="/intervnueva">Nueva</NavLink></Dropdown.Item>
+    m4 = <Dropdown.Item><NavLink to="/intervbuscar">Buscar</NavLink></Dropdown.Item>
+    
+  }
+  else
+  {
+   // m1 = <NavLink to="/organos">Órganos</NavLink>
+   // m2 = <NavLink to="/doctores">Doctores</NavLink>
+   m1 = <Dropdown.Item><NavLink to="/organos">Órganos</NavLink></Dropdown.Item> 
+   m2 = <Dropdown.Item><NavLink to="/doctores">Doctores</NavLink></Dropdown.Item>
+   m3 = <Dropdown.Item to="/intervbuscar">Buscar</Dropdown.Item>
+   m4 = ""
+  }
+
   return (
     <>
    
@@ -35,25 +60,39 @@ const NavBar = () => {
   <header class="p-3 mb-1 border-bottom">
   
     <nav>
-      
+    
         <ul>
+         
           <div class="row">
-          <div class="col-1"> 
-            <NavLink to="/pacientes">Pacientes</NavLink>
+              <div class="col-2"> 
+                  <Dropdown>
+                    <Dropdown.Toggle variant="info" id="dropdown-basic">
+                      Datos
+                    </Dropdown.Toggle>
+                        <Dropdown.Menu>
+                          {m1}
+                          {m2}                  
+                        </Dropdown.Menu>
+                  </Dropdown> 
+
+              </div>
+          <div class="col-2">
+          <Dropdown>
+                    <Dropdown.Toggle variant="info" id="dropdown-basic">
+                      Intervenciones
+                    </Dropdown.Toggle>
+                        <Dropdown.Menu>
+                          {m3}
+                          {m4}                  
+                        </Dropdown.Menu>
+                  </Dropdown> 
+         
           </div>
-          <div class="col-1">
-            <NavLink to="/intervenciones">Intervenciones</NavLink>
-          </div>
-          <div class="col-1"> 
-            <NavLink to="/organos">Órganos</NavLink>
-          </div>
-          <div class="col-1"> 
-            <NavLink to="/doctores">Doctores</NavLink>
-          </div>
-          <div class="col-4">
+          <div class="col-5">
 
           </div>
-          <div class="col-4">
+
+          <div class="col-1">
            
           <Dropdown>
       <Dropdown.Toggle variant="info" id="dropdown-basic">
