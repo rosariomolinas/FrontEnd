@@ -30,7 +30,7 @@ const Organos = (props) => {
    const [vermodal, setVermodal] = useState(false)  
    const [searchcodigo, setSearchCodigo] = useState("")
    const [searchnombre, setSearchNombre] = useState("")  
-   const [searchactivo, setSearchActivo] = useState(false)          
+   const [searchmtejido, setSearchM] = useState(false)          
    const [searchactivo, setSearchActivo] = useState(false) 
    const [searchactivo, setSearchActivo] = useState(false) 
    const [searchactivo, setSearchActivo] = useState(false)
