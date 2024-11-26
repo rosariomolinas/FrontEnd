@@ -1,23 +1,40 @@
-// Pacientes.js
+// Orrganos.js
 
 import { React, useState } from "react"
 import Toast from 'react-bootstrap/Toast';
 import ToastContainer from 'react-bootstrap/ToastContainer';
 
 
-const Pacientes = (props) => {
+const Organos = (props) => {
            
    const [codigo, setCodigo] = useState("")
    const [nombre, setNombre] = useState("")  
-   const [apellido, setApellido] = useState("")  
-   const [edad, setEdad] = useState("")  
+   const [mtejido, setMtejido] = useState(false) 
+   const [msangre, setMsangre] = useState(false) 
+   const [tomo3d, setTomo3d] = useState(false)  
+   const [medica, setMedica] = useState(false)
+   const [orden, setOrden] = useState("")       
    const [activo, setActivo] = useState(false)  
    const [noteditable, setNotEditable] = useState(true)
 
+//  code   : Number,
+//  nombre :  String,
+//  mtejido : Boolean,
+//  msangre : Boolean,
+//  tomo3d : Boolean,
+//  medica : Boolean,
+//  orden : Number
+
+           
    // ventana de búsqueda
    const [vermodal, setVermodal] = useState(false)  
    const [searchcodigo, setSearchCodigo] = useState("")
    const [searchnombre, setSearchNombre] = useState("")  
+   const [searchactivo, setSearchActivo] = useState(false)          
+   const [searchactivo, setSearchActivo] = useState(false) 
+   const [searchactivo, setSearchActivo] = useState(false) 
+   const [searchactivo, setSearchActivo] = useState(false)
+   const [searchorden, setSearchOrden] = useState("")         
    const [searchactivo, setSearchActivo] = useState(false)  
    const [searchgrilla, setSearchGrilla] = useState([])  
    const [searchMessage, setSearchMessage] = useState("")
