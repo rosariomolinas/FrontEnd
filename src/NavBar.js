@@ -100,7 +100,7 @@ const NavBar = (props) => {
       </Dropdown.Toggle>
 
       <Dropdown.Menu>
-        <Dropdown.Item to="/passchange">Cambiar contraseña</Dropdown.Item>
+        <Dropdown.Item to="/passchange"><NavLink to="/passchange">Cambiar contraseña</NavLink></Dropdown.Item>
         <Dropdown.Item to="/intervenciones"><NavLink to="/">Cerrar sesión</NavLink></Dropdown.Item>
       </Dropdown.Menu>
     </Dropdown> 

@@ -1,6 +1,6 @@
 // Intervnueva.js
 
-import { React, useState } from "react"
+import { React, useState, useEffect } from "react"
 import Toast from 'react-bootstrap/Toast';
 import ToastContainer from 'react-bootstrap/ToastContainer';
 
@@ -9,7 +9,6 @@ import ToastContainer from 'react-bootstrap/ToastContainer';
 
 const Intervnueva = (props) => {
 
-    
     const [codpaciente, setCodpaciente] = useState(0)  
     const [nombpaciente, setNombpaciente] = useState("")  
     const [noteditable, setNotEditable] = useState(true)
@@ -34,7 +33,7 @@ const Intervnueva = (props) => {
     const [searchDocgrilla, setSearchDocGrilla] = useState([])  
     const [searchDocMessage, setSearchDocMessage] = useState("")
     
-    const [listOrganos, setListOrganos] = useState([])
+    const [listOrganos, setListOrganos] = useState([] )
     const [orgValores, setOrgValores] = useState([])
     
     const [listMedica, setListMedica] = useState([])
@@ -59,6 +58,95 @@ const Intervnueva = (props) => {
     const [showToast, setShowToast] = useState(false);
     const [textoToast, setTextoToast] = useState("");
     
+    useEffect(() => {
+     
+    var jstring;
+    var url;
+    
+    jstring = '{}';
+            url = "http://localhost:8080/robiotics/org/traertodos";
+
+        /* fetch de búsqueda */
+        var options = {
+          method: 'POST',
+          headers: {
+          'Content-Type': 'application/json'
+          },
+          mode: 'cors',
+          credential : 'include',
+          body:  jstring,
+          //JSON.stringify({"code" : 4, "activo" : true}),
+          
+          };
+        
+        fetch(url, options)
+        .then( response => response.json())
+        .then( data => {
+            console.log("organos", data.lista)
+            if ( data.lista.length)
+            {
+
+              
+              setListOrganos(data.lista);
+
+              setOrgValores(data.valores);
+            }          
+
+
+
+
+
+
+
+
+        })
+
+
+
+
+
+  }, []);
+
+
+  useEffect(() => {
+     
+    var jstring1;
+    var url1;
+    
+    jstring1 = '{}';
+            url1 = "http://localhost:8080/robiotics/medica/traertodos";
+
+        /* fetch de búsqueda */
+        var options1 = {
+          method: 'POST',
+          headers: {
+          'Content-Type': 'application/json'
+          },
+          mode: 'cors',
+          credential : 'include',
+          body:  jstring1,
+          //JSON.stringify({"code" : 4, "activo" : true}),
+          
+          };
+        
+        fetch(url1, options1)
+        .then( response => response.json())
+        .then( data => {
+            console.log(data)
+            if ( data.length)
+            {
+              setListMedica(data);
+              
+            }  
+          })
+
+
+
+
+  }, []);
+
+
+
 /* Handle de evento modelo */
 async function handleModel(e){
     e.preventDefault()
@@ -171,81 +259,11 @@ async function handleOnChangeChecked(e, inx, campo){
  async function handleaddRuta(e){
   e.preventDefault()
   try {
-    // la primera vez, cargo los organos
-    if (!listOrganos.length)
-    {
-      console.log("2")
-      var jstring;
-      var url;
-      
-      jstring = '{}';
-              url = "http://localhost:8080/robiotics/org/traertodos";
 
-          /* fetch de búsqueda */
-          var options = {
-            method: 'POST',
-            headers: {
-            'Content-Type': 'application/json'
-            },
-            mode: 'cors',
-            credential : 'include',
-            body:  jstring,
-            //JSON.stringify({"code" : 4, "activo" : true}),
-            
-            };
-          
-          fetch(url, options)
-          .then( response => response.json())
-          .then( data => {
-              console.log(data.lista)
-              if ( data.lista.length)
-              {
-                setListOrganos(data.lista);
-                setOrgValores(data.valores);
-              }          
-            
-          })
-        }   
-          
-     // la primera vez, cargo los medicamentos
-     if (!listMedica.length)
-      {
-        
-        var jstring1;
-        var url1;
-        
-        jstring1 = '{}';
-                url1 = "http://localhost:8080/robiotics/medica/traertodos";
-  
-            /* fetch de búsqueda */
-            var options1 = {
-              method: 'POST',
-              headers: {
-              'Content-Type': 'application/json'
-              },
-              mode: 'cors',
-              credential : 'include',
-              body:  jstring1,
-              //JSON.stringify({"code" : 4, "activo" : true}),
-              
-              };
-            
-            fetch(url1, options1)
-            .then( response => response.json())
-            .then( data => {
-                console.log(data)
-                if ( data.length)
-                {
-                  setListMedica(data);
-            
-                }          
-              
-            })
-          }       
-   
+   console.log("org 0-bis-", listOrganos);
     setIntervGrilla (intervGrilla => [...intervGrilla, {"organo": listOrganos[0].code, "mtejido" : false, "mtejidovis" : listOrganos[0].mtejido, 
                "msangre" : false, "msangrevis" : listOrganos[0].msangre, "tomo3d" : false, "tomo3dvis" : listOrganos[0].tomo3d, "medica" : 0}]);
-    
+        
   } 
      
   catch (error) {
@@ -263,6 +281,8 @@ async function handlePresup(e){
   var cost_total = 0;
   var tiempo_total = 0;
   var cantMedic = 0;
+  var almenos1 = false;
+  var sininterv = false;
   if (nombpaciente === "")
   { 
      errMessage.push("Ingresar Paciente");
@@ -277,6 +297,16 @@ async function handlePresup(e){
       
       errMessage.push("Ingresar fecha de Intervención");  
     } 
+      // la fecha debe estar en el futuro
+  else
+  {
+    var dfecInter = new Date(fechInterv);
+    var dhoy = new Date();
+    if (! (dfecInter > dhoy))
+    {
+      errMessage.push("La fecha de Intervención debe ser futura");  
+    } 
+  }
  
   if (intervGrilla.length < 1)
     errMessage.push("Al menos cargar un órgano en la ruta");  
@@ -286,6 +316,7 @@ async function handlePresup(e){
     intervGrilla.map((c, i) => 
     {
       //verificar no se repitan los órganos
+      almenos1 = false;
       if (repOrg.includes(c.organo))
       {
           orgRepetido = true
@@ -297,16 +328,19 @@ async function handlePresup(e){
       {
         cost_total = cost_total + orgValores.tejido_costo;
         tiempo_total = tiempo_total + orgValores.tejido_tiempo;
+        almenos1 = true;
       }
       if(c.msangre)
       {
         cost_total = cost_total + orgValores.sangre_costo;
         tiempo_total = tiempo_total + orgValores.sangre_tiempo;
+        almenos1 = true;
       }
       if(c.tomo3d)
         {
           cost_total = cost_total + orgValores.tomo3d_costo;
           tiempo_total = tiempo_total + orgValores.tomo3d_tiempo;
+          almenos1 = true;
         }
 
        // contabilizar medicamentos 
@@ -314,16 +348,23 @@ async function handlePresup(e){
        {
         cantMedic++;
        }
+
+       if (!almenos1)
+       {
+        sininterv = true;
+       } 
        
     });
 
-
+    if (sininterv)
+    {
+      errMessage.push("Órgano sin ninguna intervención");  
+    }
     if (orgRepetido)
        errMessage.push("Órganos repetidos en la ruta");  
     if (cantMedic > 2)
        errMessage.push("Más de 2 medicaciones seleccionadas");  
-
-
+   
     setPresupCosto(cost_total);
     setPresupTiempo(tiempo_total);
   setPresupErrMessage(errMessage);
@@ -343,13 +384,20 @@ async function handleConfirm(e){
         jstring = '{"paciente" : ' + codpaciente + ', "doctor" : ' + coddoctor + ', "fecint" : "' + fechInterv + '" , "costo" : ' + presupCosto + ', "tiempo" : ' + presupTiempo + ', "ruta" : [' ;
         intervGrilla.map((c, i) => 
           {
+           
+            if (i > 0)
+              {
+                jstring = jstring + ', ';
+                console.log("dentro", i);
+              }            
             jstring = jstring + '{ "organo" : ' + c.organo + ', "mtejido" : ' + c.mtejido + ', "msangre" : ' + c.msangre  + ', "tomo3d"  : ' + c.tomo3d + ', "medica" :  ' +  c.medica + '}'
+
 
           });
           jstring = jstring + '] }';
           url = "http://localhost:8080/robiotics/interv/addnew";
          
-
+          console.log("interv", jstring);
     /* fetch de búsqueda */
     var options = {
       method: 'POST',
@@ -367,13 +415,17 @@ async function handleConfirm(e){
     .then( response => response.json())
     .then( data => {
       
-        console.log("ruta add new", data)       
+        console.log("ruta add new", data)     
+        setTextoToast("Datos de intervención guardados");
+        setShowToast(true);  
       
     })
 
 
       } catch (error) {
           console.log(error);
+          setTextoToast("Error grabando datos de intervención");
+        setShowToast(true);  
           
       }
   }
@@ -669,7 +721,7 @@ async function    handleOnChangeDocActivo(e){
   
   </head>
 
-
+  <h5>Intervenciones</h5>
   <div id="divtabcampos" class="container text-center mb-3">
     <div class="row align-items-start mb-2">
       <div class="col col-2 borde">
@@ -804,13 +856,13 @@ async function    handleOnChangeDocActivo(e){
       </div>
     </div>
 
-    <div class="row align-items-start mb-2">
-       <div class="col col-3 borde align-items-start text-danger">
+    <div class="row   mb-2">
+       <div class="col col-3 borde  text-danger">
           
 
           {  presupErrMessage.map (( unolista ) => (
                     <>
-                      <label id="err_message">{unolista}</label>
+                      <label class="form-label " id="err_message">{unolista}</label><br></br>
             
                    </>
 

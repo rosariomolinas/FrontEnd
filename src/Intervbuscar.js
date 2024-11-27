@@ -16,7 +16,8 @@ const Intervbuscar = (props) => {
  
     const [coddoctor, setCoddoctor] = useState(0)
     const [nombDoctor, setNombDoctor] = useState("")  
-    const [fechInterv, setFechInterv] = useState("")  
+    const [fechIntervDes, setFechIntervDes] = useState("")  
+    const [fechIntervHas, setFechIntervHas] = useState("")  
 
     // ventana de búsqueda paciente
     const [vermodal, setVermodal] = useState(false)  
@@ -38,17 +39,12 @@ const Intervbuscar = (props) => {
     const [orgValores, setOrgValores] = useState([])
     
     const [listMedica, setListMedica] = useState([])
-    //{"code" : 1, "nombre" : "corazón"}, {"code" : 2, "nombre" : "pulmón"}, {"code" : 3, "nombre" : "higado"}])
-
-    const [presupErrMessage, setPresupErrMessage] = useState([])
-    const [presupCosto, setPresupCosto] = useState(0)
-    const [presupTiempo, setPresupTiempo] = useState(0)
 
 
     const [intervGrilla, setIntervGrilla] = useState([])  
     const [intervDetailGrilla, setIntervDetailGrilla] = useState([])  
 
-
+    const [searchInterv, setsearchInterv] = useState("")
 
     // ventana de confirmación
     const [vermodalconf, setVermodalConf] = useState(false)  
@@ -181,13 +177,51 @@ async function handleSearchInterv(e){
         {
           jstring = jstring + '"paciente" : ' + codpaciente
         }
+        
         if (coddoctor != 0)
           {
-            jstring = jstring + '"doctor" : ' + coddoctor
+            if(jstring === '{ ')
+            {
+              jstring = jstring + '"doctor" : ' + coddoctor
+
+            }
+            else
+            {
+              jstring = jstring + ', "doctor" : ' + coddoctor
+            }
+
+            
           }
+        if (! (fechIntervDes ==="") )
+          {
+            if(jstring !== '{ ')
+              {
+                jstring = jstring + ', "fecdes" : "' + fechIntervDes + '"'
+              }
+              else
+              {
+                jstring = jstring + ' "fecdes" : "' + fechIntervDes + '"'
+  
+              }
+  
+          }
+        if (! (fechIntervHas ==="") )
+          {      
+            if(jstring !== '{ ')
+              {    
+                 jstring = jstring + ', "fechas" : "' + fechIntervHas + '"'  
+              }
+              else
+              {
+                jstring = jstring + '"fechas" : "' + fechIntervHas + '"'  
+
+              }
+          }
+
+
         //        "code" : "' + searchDoccodigo +  '", "token" : "' + props.vtoken + '", ' + msgactivo +  '}';
         jstring = jstring + '}';   
-        console.log(jstring);
+        console.log("cadena búsqueda", jstring);
         url = "http://localhost:8080/robiotics/interv/traeralgunos";
       
     
@@ -210,11 +244,12 @@ var options = {
 fetch(url, options)
 .then( response => response.json())
 .then( data => {
-  console.log(data.lista);
-  setIntervGrilla(data.lista);
-    if (! data.lista.length)
+  console.log("res", data.data);
+  setIntervGrilla(data.data);
+    if (! data.data.length)
     {
-      setSearchDocMessage("No hay coincidencias");
+      console.log("No hay" );
+      setsearchInterv(data.message);
 
     }          
   
@@ -409,156 +444,6 @@ async function handleOnChangeChecked(e, inx, campo){
       console.log(error);
       
   }
-}
-
-
-
-async function handlePresup(e){
-  var errMessage = [];
-  var repOrg = [];  // organos repetidos
-  var orgRepetido = false;
-  var cost_total = 0;
-  var tiempo_total = 0;
-  var cantMedic = 0;
-  if (nombpaciente === "")
-  { 
-     errMessage.push("Ingresar Paciente");
-  }
-  if (nombDoctor === "")
-  {
-    
-    errMessage.push("Ingresar Médico");  
-  } 
-  if (fechInterv === "")
-    {
-      
-      errMessage.push("Ingresar fecha de Intervención");  
-    } 
- 
-  if (intervGrilla.length < 1)
-    errMessage.push("Al menos cargar un órgano en la ruta");  
-
-// recorro la grilla de intervenciones
-
-    intervGrilla.map((c, i) => 
-    {
-      //verificar no se repitan los órganos
-      if (repOrg.includes(c.organo))
-      {
-          orgRepetido = true
-      }
-      repOrg.push(c.organo)
-/* tejido */
-//if (vfilas[i].children[1].children[0].checked)
-      if(c.mtejido)
-      {
-        cost_total = cost_total + orgValores.tejido_costo;
-        tiempo_total = tiempo_total + orgValores.tejido_tiempo;
-      }
-      if(c.msangre)
-      {
-        cost_total = cost_total + orgValores.sangre_costo;
-        tiempo_total = tiempo_total + orgValores.sangre_tiempo;
-      }
-      if(c.tomo3d)
-        {
-          cost_total = cost_total + orgValores.tomo3d_costo;
-          tiempo_total = tiempo_total + orgValores.tomo3d_tiempo;
-        }
-
-       // contabilizar medicamentos 
-       if ( c.medica != 0) 
-       {
-        cantMedic++;
-       }
-       
-    });
-
-
-    if (orgRepetido)
-       errMessage.push("Órganos repetidos en la ruta");  
-    if (cantMedic > 2)
-       errMessage.push("Más de 2 medicaciones seleccionadas");  
-
-
-    setPresupCosto(cost_total);
-    setPresupTiempo(tiempo_total);
-  setPresupErrMessage(errMessage);
-}
-
-async function handleConfirm(e){
-  handlePresup();
-  console.log("--", presupErrMessage.length);
-  if (presupErrMessage.length == 0)
-  {
-        var jstring;
-      var url;
-      e.preventDefault()
-      try {
-
-        // preparar json
-        jstring = '{"paciente" : ' + codpaciente + ', "doctor" : ' + coddoctor + ', "fecint" : "' + fechInterv + '" , "costo" : ' + presupCosto + ', "tiempo" : ' + presupTiempo + ', "ruta" : [' ;
-        intervGrilla.map((c, i) => 
-          {
-            jstring = jstring + '{ "organo" : ' + c.organo + ', "mtejido" : ' + c.mtejido + ', "msangre" : ' + c.msangre  + ', "tomo3d"  : ' + c.tomo3d + ', "medica" :  ' +  c.medica + '}'
-
-          });
-          jstring = jstring + '] }';
-          url = "http://localhost:8080/robiotics/interv/addnew";
-         
-
-    /* fetch de búsqueda */
-    var options = {
-      method: 'POST',
-      headers: {
-      'Content-Type': 'application/json'
-      },
-      mode: 'cors',
-      credential : 'include',
-      body:  jstring,
-      //JSON.stringify({"code" : 4, "activo" : true}),
-      
-      };
-
-    fetch(url, options)
-    .then( response => response.json())
-    .then( data => {
-      
-        console.log("ruta add new", data)       
-      
-    })
-
-
-      } catch (error) {
-          console.log(error);
-          
-      }
-  }
-  
-}
-
-
-async function handleEliminar(e, ind){
-  const fila = ind
-  const opt = e.target.value;
-  var i;
-  try {
-    console.log("grilla filas", intervGrilla.length );
-    const newintervGrilla = [];
-    for(i=0; i < intervGrilla.length; i++)
-    {
-      if (i != fila) {
-        newintervGrilla.push(intervGrilla[i])
-      }
-
-    }
-      console.log("grilla nueva", newintervGrilla)
-      setIntervGrilla(newintervGrilla);
-
-    } catch (error) {
-      console.log(error);
-      
-    }
 }
 
 
@@ -826,7 +711,7 @@ async function    handleOnChangeDocActivo(e){
   
   </head>
 
-
+  <h5>Búsqueda de Intervenciones</h5>
   <div id="divtabcampos" class="container text-center mb-3">
     <div class="row align-items-start mb-2">
       <div class="col col-2 borde">
@@ -850,8 +735,17 @@ async function    handleOnChangeDocActivo(e){
       <div class="col col-2 borde">
          <label for="intervDate">Fecha Intervención:</label>
       </div>
+      <div class="col col-1 borde">
+         <label for="intervDateDes">Desde:</label>
+      </div>
       <div class="col col-2 borde">
-      <input id="intervDate" onChange={e => {setFechInterv(e.target.value)}} class="form-control" type="date" value={fechInterv} />
+      <input id="intervDateDes" onChange={e => {setFechIntervDes(e.target.value)}} class="form-control" type="date" value={fechIntervDes} />
+      </div>
+      <div class="col col-1 borde">
+         <label for="intervDateHas">Hasta:</label>
+      </div>
+      <div class="col col-2 borde">
+      <input id="intervDateHas" onChange={e => {setFechIntervHas(e.target.value)}} class="form-control" type="date" value={fechIntervHas} />
       </div>
     </div>
    
@@ -860,7 +754,9 @@ async function    handleOnChangeDocActivo(e){
       <div class="col col-3 borde">
         <button type="button" class="btn btn-info" id="find" onClick={handleSearchInterv} disabled={!noteditable} >Buscar Intervenciones</button>
       </div>
-      
+      <div class="col col-4 borde">
+           <label id="log_message">{searchInterv}</label>
+      </div>
     </div>
   </div>
   
@@ -905,16 +801,16 @@ async function    handleOnChangeDocActivo(e){
                       <div key={index+'_1sa'} class="col col-1 border-primary">  {unolista.doctor}
                          
                       </div>
-                      <div key={index+'_1to'} class="col col-1 border-primary">  {unolista.paciente}
+                      <div key={index+'_1to1'} class="col col-1 border-primary">  {unolista.paciente}
                          
                       </div>
-                      <div key={index+'_1to'} class="col col-1 border-primary">  {unolista.costo}
+                      <div key={index+'_1to2'} class="col col-1 border-primary">  {unolista.costo}
                          
                       </div>
-                      <div key={index+'_1to'} class="col col-1 border-primary">  {unolista.tiempo}
+                      <div key={index+'_1to3'} class="col col-1 border-primary">  {unolista.tiempo}
                          
                       </div>
-                      <div key={index+'_1bo'} class="col col-3 border-primary"> <button type="button" class="btn btn-primary" id="verdetalle" onClick={(evt) => handleVerDetalle(evt, index)} >Ver detalle</button>
+                      <div key={index+'_1bo4'} class="col col-3 border-primary"> <button type="button" class="btn btn-primary" id="verdetalle" onClick={(evt) => handleVerDetalle(evt, index)} >Ver detalle</button>
                       </div> 
 
                     </div>
@@ -970,7 +866,7 @@ async function    handleOnChangeDocActivo(e){
                       <div key={index+'_2sa'} class="col col-1 border-primary"> <input type="checkbox" class="form-check-input" disabled checked={unolista.msangre} />  
                          
                       </div>
-                      <div key={index+'_2to'} class="col col-1 border-primary"> <input type="checkbox" class="form-check-input" disabled cecked={unolista.tomo3d} /> 
+                      <div key={index+'_2to'} class="col col-1 border-primary"> <input type="checkbox" class="form-check-input" disabled checked={unolista.tomo3d} /> 
                          
                       </div>
                       <div key={index+'_2me'} class="col col-2 border-primary"> 
