@@ -1,75 +1,59 @@
-// App.js
-import NavBar from "./NavBar";
-import { Routes, Route } from 'react-router-dom';
-import React, { Component } from "react";
+import { useState } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import Container from 'react-bootstrap/Container';
+import NavBar from './components/NavBar';
+import RutaProtegida from './components/RutaProtegida';
+import Login from './pages/Login';
+import Inicio from './pages/Inicio';
+import Pacientes from './pages/Pacientes';
+import Doctores from './pages/Doctores';
+import Organos from './pages/Organos';
+import IntervNueva from './pages/IntervNueva';
+import IntervBuscar from './pages/IntervBuscar';
+import CambiarPassword from './pages/CambiarPassword';
+import { authService } from './services';
+import { perfilesDe } from './rutas';
 
-//import Home from './Pages/Home';
-import Login  from './Login';
-import Pacientes from './Pacientes';
-import Organos from './Organos';
-import Doctores from './Doctores';
-import Intervnueva from './Intervnueva';
-import Intervbuscar from './Intervbuscar';
-import ChangePass from './ChangePass';
+const PAGINAS = [
+  ['/pacientes', Pacientes],
+  ['/doctores', Doctores],
+  ['/organos', Organos],
+  ['/intervnueva', IntervNueva],
+  ['/intervbuscar', IntervBuscar],
+];
 
-class  App extends Component {
+function App() {
+  const [usuario, setUsuario] = useState(() => authService.sesionGuardada());
 
-   constructor(props){
-     super(props);
-     this.state = {token : ""}
+  const logout = async () => {
+    try {
+      await authService.logout();
+    } finally {
+      setUsuario(null);
+    }
+  };
 
-   
-   }
+  if (!usuario) return <Login onLogin={setUsuario} />;
 
-   newToken = (newToken) => {
-      this.setState({ token : newToken})
-   }
-
-   getProfile = (getProfile) => {
-      this.setState({ profile : getProfile})
-   }
-
-   render() {
-
-       if (this.state.token === "")
-         {
-           return ( 
-            <>
-            <Login newToken={ this.newToken } getProfile={this.getProfile}/>
-            </>
-            );
-   
-         } 
-         else {
-    
-   
-            return (
-               
-               <>
-                <head>
-      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"/>
-      <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
-      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
-      <title>Robiotics</title>
-
-      <link rel="stylesheet" href="./../public/css/styleMain.css"/>
-      <link rel="icon" href="./../public/images/fotologo.jpg"/> 
-  </head>
-               <NavBar vprofile = {this.state.profile}/>
-                  <Routes>
-                     <Route path="/pacientes" element={ <Pacientes vtoken = {this.state.token}/>} />
-                     <Route path="/intervnueva" element={<Intervnueva vtoken = {this.state.token} />} />
-                     <Route path="/intervbuscar" element={<Intervbuscar vtoken = {this.state.token} />} />
-                     <Route path="/doctores" element={<Doctores />} />
-                     <Route path="/organos" element={<Organos />} />
-                     <Route path="/logout" element={<Login />} />
-                     <Route path="/passchange" element={<ChangePass />} />
-                  </Routes>
-               </>
-               );  
-           }
+  return (
+    <>
+      <NavBar usuario={usuario} onLogout={logout} />
+      <Container as="main" className="pb-5">
+        <Routes>
+          <Route path="/" element={<Inicio usuario={usuario} />} />
+          {PAGINAS.map(([path, Pagina]) => (
+            <Route
+              key={path}
+              path={path}
+              element={<RutaProtegida usuario={usuario} perfiles={perfilesDe(path)}><Pagina /></RutaProtegida>}
+            />
+          ))}
+          <Route path="/passchange" element={<CambiarPassword usuario={usuario} />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Container>
+    </>
+  );
 }
-};
- 
+
 export default App;

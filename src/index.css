@@ -1,13 +1,81 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/*
+ * Estilos propios sobre Bootstrap 5, escritos mobile-first:
+ * la base es para pantallas chicas y los media queries (min-width) agregan
+ * ajustes para SM (>= 576px), MD (>= 768px) y LG (>= 992px).
+ */
+
+:root {
+  --color-fondo: #f4f6f9;
+  --color-primario: #0d6efd;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+body {
+  background-color: var(--color-fondo);
+}
+
+/* Botones de acción: en celular ocupan todo el ancho, uno debajo del otro */
+.botonera {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Filas que se tocan para elegir o ver detalle */
+.tabla-seleccion tbody tr {
+  cursor: pointer;
+}
+
+.tabla-ruta select {
+  min-width: 9rem;
+}
+
+.pantalla-login {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.tarjeta-login {
+  width: 100%;
+}
+
+.tarjeta-acceso {
+  transition: box-shadow 0.15s ease-in-out;
+}
+
+.tarjeta-acceso:hover,
+.tarjeta-acceso:focus {
+  box-shadow: 0 0.25rem 0.75rem rgba(13, 110, 253, 0.25);
+}
+
+.contenido-angosto {
+  width: 100%;
+}
+
+/* SM */
+@media (min-width: 576px) {
+  .botonera {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .tarjeta-login {
+    max-width: 400px;
+  }
+}
+
+/* MD */
+@media (min-width: 768px) {
+  .contenido-angosto {
+    max-width: 540px;
+  }
+}
+
+/* LG */
+@media (min-width: 992px) {
+  main.container {
+    padding-top: 0.5rem;
+  }
 }
