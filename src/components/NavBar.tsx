@@ -4,10 +4,11 @@ import NavDropdown from 'react-bootstrap/NavDropdown';
 import Container from 'react-bootstrap/Container';
 import { NavLink } from 'react-router-dom';
 import { MENU } from '../rutas';
+import type Usuario from '../models/Usuario';
 
 // Barra de navegación; muestra solo las opciones permitidas para el perfil del usuario.
 // Input: usuario. Output: onLogout().
-function NavBar({ usuario, onLogout }) {
+function NavBar({ usuario, onLogout }: { usuario: Usuario; onLogout: () => void }) {
   const opciones = MENU.filter((m) => usuario.tienePerfil(m.perfiles));
   const grupos = [...new Set(opciones.map((m) => m.grupo))];
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
@@ -13,21 +13,34 @@ import ListaErrores from '../components/ListaErrores';
 import {
   pacienteService, doctorService, medicamentoService, intervencionService,
 } from '../services';
+import type Intervencion from '../models/Intervencion';
+import type Entidad from '../models/Entidad';
+import type Paciente from '../models/Paciente';
+import type Doctor from '../models/Doctor';
+import type Organo from '../models/Organo';
+import type Medicamento from '../models/Medicamento';
 
-const porCodigo = (lista) => Object.fromEntries(lista.map((e) => [e.code, e]));
+interface Catalogo {
+  organos: Organo[];
+  medicamentos: Medicamento[];
+  pacientes: Record<number, Paciente>;
+  doctores: Record<number, Doctor>;
+}
+
+const porCodigo = <T extends Entidad>(lista: T[]): Record<number, T> => Object.fromEntries(lista.map((e) => [e.code, e]));
 
 // Listado de intervenciones con filtro por paciente, médico y fechas, y detalle de cada una.
 function IntervBuscar() {
-  const [paciente, setPaciente] = useState(null);
-  const [doctor, setDoctor] = useState(null);
+  const [paciente, setPaciente] = useState<Paciente | null>(null);
+  const [doctor, setDoctor] = useState<Doctor | null>(null);
   const [desde, setDesde] = useState('');
   const [hasta, setHasta] = useState('');
-  const [resultados, setResultados] = useState(null);
+  const [resultados, setResultados] = useState<Intervencion[] | null>(null);
   const [mensaje, setMensaje] = useState('');
   const [error, setError] = useState('');
   const [buscando, setBuscando] = useState(false);
-  const [detalle, setDetalle] = useState(null);
-  const [catalogo, setCatalogo] = useState({
+  const [detalle, setDetalle] = useState<Intervencion | null>(null);
+  const [catalogo, setCatalogo] = useState<Catalogo>({
     organos: [], medicamentos: [], pacientes: {}, doctores: {},
   });
 
@@ -48,9 +61,9 @@ function IntervBuscar() {
       .catch((err) => setError(`No se pudieron cargar los datos: ${err.message}`));
   }, []);
 
-  const nombre = (mapa, code) => (mapa[code] ? mapa[code].nombreCompleto : `#${code}`);
+  const nombre = (mapa: Record<number, Entidad>, code: number | null) => (code !== null && mapa[code] ? mapa[code].nombreCompleto : `#${code}`);
 
-  const buscar = async (e) => {
+  const buscar = async (e: FormEvent) => {
     e.preventDefault();
     if (desde && hasta && desde > hasta) {
       setError('La fecha desde no puede ser posterior a la fecha hasta');
@@ -65,7 +78,7 @@ function IntervBuscar() {
       setResultados(res.intervenciones);
       setMensaje(res.mensaje);
     } catch (err) {
-      setError(err.message);
+      setError((err as Error).message);
     } finally {
       setBuscando(false);
     }

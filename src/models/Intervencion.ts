@@ -1,6 +1,28 @@
-// Un paso de la ruta: el órgano a tratar y qué se le hace.
+import type { TipoMuestra } from './Organo';
+
+export interface PasoRutaJson {
+  organo?: number | null;
+  mtejido?: boolean;
+  msangre?: boolean;
+  tomo3d?: boolean;
+  medica?: number;
+}
+
+// Un paso de la ruta: el órgano a tratar, qué muestras se toman y qué medicación (code, 0 = ninguna).
 export class PasoRuta {
-  constructor({ organo = null, mtejido = false, msangre = false, tomo3d = false, medica = 0 } = {}) {
+  organo: number | null;
+
+  mtejido: boolean;
+
+  msangre: boolean;
+
+  tomo3d: boolean;
+
+  medica: number;
+
+  constructor({
+    organo = null, mtejido = false, msangre = false, tomo3d = false, medica = 0,
+  }: PasoRutaJson = {}) {
     this.organo = organo === null ? null : Number(organo);
     this.mtejido = mtejido;
     this.msangre = msangre;
@@ -8,23 +30,67 @@ export class PasoRuta {
     this.medica = Number(medica) || 0;
   }
 
-  get tieneMuestra() {
+  get tieneMuestra(): boolean {
     return this.mtejido || this.msangre || this.tomo3d;
   }
 
-  toJson() {
+  tiene(muestra: TipoMuestra): boolean {
+    return this[muestra];
+  }
+
+  toJson(): Required<PasoRutaJson> {
     return {
       organo: this.organo, mtejido: this.mtejido, msangre: this.msangre, tomo3d: this.tomo3d, medica: this.medica,
     };
   }
 }
 
+// Costos y tiempos por tipo de muestra (vienen del backend).
+export interface ValoresMuestras {
+  tejido_costo: number;
+  sangre_costo: number;
+  tomo3d_costo: number;
+  tejido_tiempo: number;
+  sangre_tiempo: number;
+  tomo3d_tiempo: number;
+}
+
+export interface Presupuesto {
+  errores: string[];
+  costo: number;
+  tiempo: number;
+}
+
+export interface IntervencionJson {
+  _id?: string | null;
+  paciente?: number | null;
+  doctor?: number | null;
+  fecint?: string;
+  costo?: number;
+  tiempo?: number;
+  ruta?: (PasoRuta | PasoRutaJson)[];
+}
+
 export const MAX_MEDICACIONES = 2;
 
 export default class Intervencion {
+  id: string | null;
+
+  paciente: number | null;
+
+  doctor: number | null;
+
+  fecint: string;
+
+  costo: number;
+
+  tiempo: number;
+
+  ruta: PasoRuta[];
+
   constructor({
     _id = null, paciente = null, doctor = null, fecint = '', costo = 0, tiempo = 0, ruta = [],
-  } = {}) {
+  }: IntervencionJson = {}) {
     this.id = _id;
     this.paciente = paciente;
     this.doctor = doctor;
@@ -34,18 +100,17 @@ export default class Intervencion {
     this.ruta = ruta.map((p) => (p instanceof PasoRuta ? p : new PasoRuta(p)));
   }
 
-  static fromJson(json) {
-    return new Intervencion(json || {});
+  static fromJson(json: unknown): Intervencion {
+    return new Intervencion((json || {}) as IntervencionJson);
   }
 
-  get fecha() {
+  get fecha(): string {
     return this.fecint ? String(this.fecint).substring(0, 10) : '';
   }
 
   // Reglas de negocio de la planificación. Devuelve los errores y el costo/tiempo estimados.
-  // valores: costos y tiempos por tipo de muestra que manda el backend.
-  presupuestar(valores, hoy = new Date()) {
-    const errores = [];
+  presupuestar(valores: ValoresMuestras, hoy = new Date()): Presupuesto {
+    const errores: string[] = [];
     if (!this.paciente) errores.push('Seleccioná un paciente');
     if (!this.doctor) errores.push('Seleccioná un médico');
     if (!this.fecint) errores.push('Ingresá la fecha de la intervención');

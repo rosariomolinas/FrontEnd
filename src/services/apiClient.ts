@@ -2,29 +2,34 @@ import { API_URL } from '../config';
 
 // Error de la API con un mensaje listo para mostrar al usuario.
 export class ApiError extends Error {
-  constructor(message, status = 0, errors = []) {
+  constructor(message: string, public status = 0, public errors: string[] = []) {
     super(message);
-    this.status = status;
-    this.errors = errors;
   }
+}
+
+// Forma general de las respuestas del backend.
+export interface ApiResponse<T = unknown> {
+  data: T;
+  message?: string;
+  errors?: string[];
+  [extra: string]: unknown;
 }
 
 // Cliente HTTP único de la app (patrón Singleton): agrega el token y traduce errores.
 class ApiClient {
-  constructor(baseUrl) {
-    this.baseUrl = baseUrl;
-    this.token = null;
-  }
+  private token: string | null = null;
 
-  setToken(token) {
+  constructor(private readonly baseUrl: string) {}
+
+  setToken(token: string | null) {
     this.token = token;
   }
 
-  async post(path, body = {}) {
-    const headers = { 'Content-Type': 'application/json' };
+  async post<R = ApiResponse>(path: string, body: object = {}): Promise<R> {
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     if (this.token) headers.Authorization = `Bearer ${this.token}`;
 
-    let response;
+    let response: Response;
     try {
       response = await fetch(`${this.baseUrl}${path}`, {
         method: 'POST',
@@ -35,7 +40,7 @@ class ApiClient {
       throw new ApiError('No se pudo conectar con el servidor. Revisá tu conexión e intentá de nuevo.');
     }
 
-    let data = null;
+    let data: (ApiResponse & R) | null = null;
     try {
       data = await response.json();
     } catch (e) {
@@ -46,7 +51,7 @@ class ApiClient {
       const message = (data && data.message) || `Error ${response.status} del servidor`;
       throw new ApiError(message, response.status, (data && data.errors) || []);
     }
-    return data;
+    return data as R;
   }
 }
 

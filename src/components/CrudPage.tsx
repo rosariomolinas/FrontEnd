@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
@@ -8,24 +8,39 @@ import Badge from 'react-bootstrap/Badge';
 import Modal from 'react-bootstrap/Modal';
 import BuscadorModal from './BuscadorModal';
 import ListaErrores from './ListaErrores';
-import Aviso from './Aviso';
+import Aviso, { type AvisoState, type VarianteAviso } from './Aviso';
+import type CrudService from '../services/CrudService';
+import type Entidad from '../models/Entidad';
+import type { CampoDef, EntidadClass } from '../models/Entidad';
+import { ApiError } from '../services/apiClient';
+
+interface CrudPageProps<T extends Entidad> {
+  titulo: string;
+  plural: string;
+  service: CrudService<T>;
+  Model: EntidadClass<T>;
+}
+
+const mensajesDe = (err: unknown): string[] => (
+  err instanceof ApiError && err.errors.length ? err.errors : [(err as Error).message]
+);
 
 // Pantalla de alta, búsqueda, modificación y baja de una entidad.
 // Input: titulo (singular), plural, service (CrudService) y Model (clase con `static campos`).
-function CrudPage({
+function CrudPage<T extends Entidad>({
   titulo, plural, service, Model,
-}) {
-  const [entidad, setEntidad] = useState(new Model());
+}: CrudPageProps<T>) {
+  const [entidad, setEntidad] = useState<T>(() => new Model());
   const [editando, setEditando] = useState(false);
-  const [errores, setErrores] = useState([]);
+  const [errores, setErrores] = useState<string[]>([]);
   const [verBuscador, setVerBuscador] = useState(false);
   const [confirmarBaja, setConfirmarBaja] = useState(false);
   const [guardando, setGuardando] = useState(false);
-  const [aviso, setAviso] = useState({ texto: '', variante: 'success' });
-  const [original, setOriginal] = useState(null);
+  const [aviso, setAviso] = useState<AvisoState>({ texto: '' });
+  const [original, setOriginal] = useState<T | null>(null);
 
   const etiqueta = titulo.toLowerCase();
-  const avisar = (texto, variante = 'success') => setAviso({ texto, variante });
+  const avisar = (texto: string, variante: VarianteAviso = 'success') => setAviso({ texto, variante });
 
   const nuevo = () => {
     setOriginal(null);
@@ -45,14 +60,14 @@ function CrudPage({
     setEditando(false);
   };
 
-  const elegido = (e) => {
+  const elegido = (e: T) => {
     setEntidad(e);
     setErrores([]);
     setEditando(false);
     setVerBuscador(false);
   };
 
-  const guardar = async (ev) => {
+  const guardar = async (ev: FormEvent) => {
     ev.preventDefault();
     const errs = entidad.validar();
     setErrores(errs);
@@ -64,7 +79,7 @@ function CrudPage({
       setEditando(false);
       avisar(`${titulo} guardado`);
     } catch (err) {
-      setErrores(err.errors && err.errors.length ? err.errors : [err.message]);
+      setErrores(mensajesDe(err));
     } finally {
       setGuardando(false);
     }
@@ -73,21 +88,23 @@ function CrudPage({
   const darDeBaja = async () => {
     setConfirmarBaja(false);
     try {
-      setEntidad(await service.eliminar(entidad.code));
+      setEntidad(await service.eliminar(entidad.code as number));
       avisar(`${titulo} dado de baja`);
     } catch (err) {
-      avisar(err.message, 'danger');
+      avisar((err as Error).message, 'danger');
     }
   };
 
-  const campoInput = ({ nombre, etiqueta: label, tipo, min, max, requerido }) => {
+  const campoInput = ({
+    nombre, etiqueta: label, tipo, min, max, requerido,
+  }: CampoDef) => {
     if (tipo === 'checkbox') {
       return (
         <Col xs={12} md={6} key={nombre}>
           <Form.Check
             id={`campo-${nombre}`}
             label={label}
-            checked={Boolean(entidad[nombre])}
+            checked={Boolean(entidad.valor(nombre))}
             disabled={!editando}
             onChange={(e) => setEntidad(entidad.con(nombre, e.target.checked))}
             className="mb-2"
@@ -103,7 +120,7 @@ function CrudPage({
             type={tipo}
             min={min}
             max={max}
-            value={entidad[nombre]}
+            value={String(entidad.valor(nombre) ?? '')}
             disabled={!editando}
             onChange={(e) => setEntidad(entidad.con(nombre, e.target.value))}
           />

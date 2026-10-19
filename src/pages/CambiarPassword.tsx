@@ -1,21 +1,23 @@
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import ListaErrores from '../components/ListaErrores';
 import Aviso from '../components/Aviso';
 import { authService } from '../services';
+import { ApiError } from '../services/apiClient';
+import type Usuario from '../models/Usuario';
 
-function CambiarPassword({ usuario }) {
+function CambiarPassword({ usuario }: { usuario: Usuario }) {
   const [actual, setActual] = useState('');
   const [nueva, setNueva] = useState('');
   const [repetida, setRepetida] = useState('');
-  const [errores, setErrores] = useState([]);
+  const [errores, setErrores] = useState<string[]>([]);
   const [aviso, setAviso] = useState('');
 
-  const guardar = async (e) => {
+  const guardar = async (e: FormEvent) => {
     e.preventDefault();
-    const errs = [];
+    const errs: string[] = [];
     if (!actual) errs.push('Ingresá la contraseña actual');
     if (nueva.length < 4) errs.push('La contraseña nueva debe tener al menos 4 caracteres');
     else if (nueva === actual) errs.push('La contraseña nueva debe ser distinta de la actual');
@@ -28,7 +30,7 @@ function CambiarPassword({ usuario }) {
       setNueva('');
       setRepetida('');
     } catch (err) {
-      setErrores(err.errors && err.errors.length ? err.errors : [err.message]);
+      setErrores(err instanceof ApiError && err.errors.length ? err.errors : [(err as Error).message]);
     }
   };
 

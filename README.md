@@ -6,7 +6,7 @@ Aplicación web de Robiotics, un sistema para planificar intervenciones quirúrg
 
 ## Tecnologías
 
-React 18 (Create React App), React Router, Bootstrap 5 y React-Bootstrap.
+React 18 con TypeScript (Create React App), React Router, Bootstrap 5 y React-Bootstrap.
 
 ## Instalación
 
@@ -40,11 +40,11 @@ Las rutas están protegidas: si un usuario entra a una pantalla que no le corres
 ## Estructura
 
 ```
-src/config.js         URL del backend según el ambiente
+src/config.ts         URL del backend según el ambiente
 src/models/           clases de negocio (Paciente, Doctor, Organo, Intervencion, ...) con validaciones
 src/services/         acceso a la API (ApiClient y un CrudService genérico por entidad)
 src/components/       componentes reutilizables (CrudPage, BuscadorModal, TablaRuta, NavBar, ...)
 src/pages/            pantallas de la app
-src/rutas.js          menú y perfiles con acceso a cada pantalla
+src/rutas.ts          menú y perfiles con acceso a cada pantalla
 src/index.css         estilos propios, mobile-first
 ```

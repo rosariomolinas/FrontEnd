@@ -1,8 +1,12 @@
 import Table from 'react-bootstrap/Table';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
+import type Organo from '../models/Organo';
+import type { TipoMuestra } from '../models/Organo';
+import type Medicamento from '../models/Medicamento';
+import type { PasoRuta, PasoRutaJson } from '../models/Intervencion';
 
-const MUESTRAS = [
+const MUESTRAS: { campo: TipoMuestra; titulo: string }[] = [
   { campo: 'mtejido', titulo: 'Tejido' },
   { campo: 'msangre', titulo: 'Sangre' },
   { campo: 'tomo3d', titulo: 'Tomografía 3D' },
@@ -10,12 +14,20 @@ const MUESTRAS = [
 
 // Muestra los pasos de la ruta de una intervención. Si recibe onChange se puede editar.
 // Input: ruta, organos, medicamentos. Output: onChange(indice, cambios), onQuitar(indice).
+interface TablaRutaProps {
+  ruta: PasoRuta[];
+  organos: Organo[];
+  medicamentos: Medicamento[];
+  onChange?: (indice: number, cambios: PasoRutaJson) => void;
+  onQuitar?: (indice: number) => void;
+}
+
 function TablaRuta({
   ruta, organos, medicamentos, onChange, onQuitar,
-}) {
+}: TablaRutaProps) {
   const editable = Boolean(onChange);
-  const organo = (code) => organos.find((o) => o.code === code);
-  const medicamento = (code) => medicamentos.find((m) => m.code === code);
+  const organo = (code: number | null) => organos.find((o) => o.code === code);
+  const medicamento = (code: number) => medicamentos.find((m) => m.code === code);
 
   if (ruta.length === 0) return <p className="text-muted">La ruta no tiene órganos.</p>;
 
@@ -41,22 +53,22 @@ function TablaRuta({
                     size="sm"
                     aria-label="Órgano"
                     value={paso.organo ?? ''}
-                    onChange={(e) => onChange(i, {
+                    onChange={(e) => onChange && onChange(i, {
                       organo: Number(e.target.value), mtejido: false, msangre: false, tomo3d: false,
                     })}
                   >
-                    {organos.map((o) => <option key={o.code} value={o.code}>{o.nombre}</option>)}
+                    {organos.map((o) => <option key={o.code} value={o.code ?? undefined}>{o.nombre}</option>)}
                   </Form.Select>
                 ) : (org ? org.nombre : `Órgano ${paso.organo}`)}
               </td>
               {MUESTRAS.map(({ campo, titulo }) => (
                 <td key={campo} className="text-center">
-                  {(!editable || (org && org[campo])) ? (
+                  {(!editable || (org && org.admite(campo))) ? (
                     <Form.Check
                       aria-label={titulo}
-                      checked={paso[campo]}
+                      checked={paso.tiene(campo)}
                       disabled={!editable}
-                      onChange={() => onChange(i, { [campo]: !paso[campo] })}
+                      onChange={() => onChange && onChange(i, { [campo]: !paso.tiene(campo) })}
                     />
                   ) : <span className="text-muted" title="Este órgano no admite esta muestra">–</span>}
                 </td>
@@ -67,7 +79,7 @@ function TablaRuta({
                     size="sm"
                     aria-label="Medicación"
                     value={paso.medica}
-                    onChange={(e) => onChange(i, { medica: Number(e.target.value) })}
+                    onChange={(e) => onChange && onChange(i, { medica: Number(e.target.value) })}
                   >
                     <option value={0}>Sin medicación</option>
                     {medicamentos.map((m) => <option key={m.code} value={m.code}>{m.nombre}</option>)}
@@ -76,7 +88,7 @@ function TablaRuta({
               </td>
               {editable && (
                 <td className="text-end">
-                  <Button size="sm" variant="outline-danger" onClick={() => onQuitar(i)}>Quitar</Button>
+                  <Button size="sm" variant="outline-danger" onClick={() => onQuitar && onQuitar(i)}>Quitar</Button>
                 </td>
               )}
             </tr>

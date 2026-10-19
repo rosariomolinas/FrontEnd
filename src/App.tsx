@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type ComponentType } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
 import NavBar from './components/NavBar';
@@ -13,8 +13,9 @@ import IntervBuscar from './pages/IntervBuscar';
 import CambiarPassword from './pages/CambiarPassword';
 import { authService } from './services';
 import { perfilesDe } from './rutas';
+import type Usuario from './models/Usuario';
 
-const PAGINAS = [
+const PAGINAS: [string, ComponentType][] = [
   ['/pacientes', Pacientes],
   ['/doctores', Doctores],
   ['/organos', Organos],
@@ -23,7 +24,7 @@ const PAGINAS = [
 ];
 
 function App() {
-  const [usuario, setUsuario] = useState(() => authService.sesionGuardada());
+  const [usuario, setUsuario] = useState<Usuario | null>(() => authService.sesionGuardada());
 
   const logout = async () => {
     try {

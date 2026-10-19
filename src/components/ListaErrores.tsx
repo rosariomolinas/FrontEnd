@@ -1,6 +1,6 @@
 import Alert from 'react-bootstrap/Alert';
 
-function ListaErrores({ errores }) {
+function ListaErrores({ errores }: { errores: string[] }) {
   if (!errores || errores.length === 0) return null;
   return (
     <Alert variant="danger" className="py-2">

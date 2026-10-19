@@ -8,26 +8,33 @@ import Spinner from 'react-bootstrap/Spinner';
 import SeleccionEntidad from '../components/SeleccionEntidad';
 import TablaRuta from '../components/TablaRuta';
 import ListaErrores from '../components/ListaErrores';
-import Aviso from '../components/Aviso';
-import Intervencion, { PasoRuta } from '../models/Intervencion';
+import Aviso, { type AvisoState } from '../components/Aviso';
+import Intervencion, {
+  PasoRuta, type PasoRutaJson, type Presupuesto, type ValoresMuestras,
+} from '../models/Intervencion';
+import type Paciente from '../models/Paciente';
+import type Doctor from '../models/Doctor';
+import type Organo from '../models/Organo';
+import type Medicamento from '../models/Medicamento';
+import { ApiError } from '../services/apiClient';
 import {
   pacienteService, doctorService, medicamentoService, intervencionService,
 } from '../services';
 
 // Caso de uso: planificar una intervención (paciente, médico, fecha y ruta de órganos) con su presupuesto.
 function IntervNueva() {
-  const [paciente, setPaciente] = useState(null);
-  const [doctor, setDoctor] = useState(null);
+  const [paciente, setPaciente] = useState<Paciente | null>(null);
+  const [doctor, setDoctor] = useState<Doctor | null>(null);
   const [fecha, setFecha] = useState('');
-  const [ruta, setRuta] = useState([]);
-  const [organos, setOrganos] = useState([]);
-  const [valores, setValores] = useState(null);
-  const [medicamentos, setMedicamentos] = useState([]);
-  const [presupuesto, setPresupuesto] = useState(null);
-  const [errores, setErrores] = useState([]);
+  const [ruta, setRuta] = useState<PasoRuta[]>([]);
+  const [organos, setOrganos] = useState<Organo[]>([]);
+  const [valores, setValores] = useState<ValoresMuestras | null>(null);
+  const [medicamentos, setMedicamentos] = useState<Medicamento[]>([]);
+  const [presupuesto, setPresupuesto] = useState<Presupuesto | null>(null);
+  const [errores, setErrores] = useState<string[]>([]);
   const [cargando, setCargando] = useState(true);
   const [guardando, setGuardando] = useState(false);
-  const [aviso, setAviso] = useState({ texto: '' });
+  const [aviso, setAviso] = useState<AvisoState>({ texto: '' });
 
   useEffect(() => {
     Promise.all([intervencionService.datosParaPlanificar(), medicamentoService.listar()])
@@ -48,7 +55,7 @@ function IntervNueva() {
   });
 
   // Cualquier cambio invalida el presupuesto calculado.
-  const cambio = (setter) => (v) => { setter(v); setPresupuesto(null); };
+  const cambio = <V, >(setter: (v: V) => void) => (v: V) => { setter(v); setPresupuesto(null); };
 
   const agregarOrgano = () => {
     const usados = ruta.map((p) => p.organo);
@@ -56,14 +63,14 @@ function IntervNueva() {
     cambio(setRuta)([...ruta, new PasoRuta({ organo: libre.code })]);
   };
 
-  const cambiarPaso = (i, cambios) => {
+  const cambiarPaso = (i: number, cambios: PasoRutaJson) => {
     cambio(setRuta)(ruta.map((p, j) => (j === i ? new PasoRuta({ ...p, ...cambios }) : p)));
   };
 
-  const quitarPaso = (i) => cambio(setRuta)(ruta.filter((p, j) => j !== i));
+  const quitarPaso = (i: number) => cambio(setRuta)(ruta.filter((p, j) => j !== i));
 
   const presupuestar = () => {
-    const resultado = intervencion().presupuestar(valores);
+    const resultado = intervencion().presupuestar(valores as ValoresMuestras);
     setErrores(resultado.errores);
     setPresupuesto(resultado.errores.length ? null : resultado);
     return resultado;
@@ -85,7 +92,7 @@ function IntervNueva() {
       setRuta([]);
       setPresupuesto(null);
     } catch (err) {
-      setErrores(err.errors && err.errors.length ? err.errors : [err.message]);
+      setErrores(err instanceof ApiError && err.errors.length ? err.errors : [(err as Error).message]);
     } finally {
       setGuardando(false);
     }

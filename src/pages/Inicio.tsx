@@ -3,8 +3,9 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { Link } from 'react-router-dom';
 import { MENU } from '../rutas';
+import type Usuario from '../models/Usuario';
 
-function Inicio({ usuario }) {
+function Inicio({ usuario }: { usuario: Usuario }) {
   const opciones = MENU.filter((m) => usuario.tienePerfil(m.perfiles));
   return (
     <section>

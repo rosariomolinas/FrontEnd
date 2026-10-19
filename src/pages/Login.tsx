@@ -1,19 +1,20 @@
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import Spinner from 'react-bootstrap/Spinner';
 import ListaErrores from '../components/ListaErrores';
 import { authService } from '../services';
+import type Usuario from '../models/Usuario';
 
 // Output: onLogin(usuario) cuando el ingreso es correcto.
-function Login({ onLogin }) {
+function Login({ onLogin }: { onLogin: (usuario: Usuario) => void }) {
   const [user, setUser] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [cargando, setCargando] = useState(false);
 
-  const ingresar = async (e) => {
+  const ingresar = async (e: FormEvent) => {
     e.preventDefault();
     if (!user || !password) {
       setError('Ingresá usuario y contraseña');
@@ -24,7 +25,7 @@ function Login({ onLogin }) {
     try {
       onLogin(await authService.login(user, password));
     } catch (err) {
-      setError(err.message);
+      setError((err as Error).message);
       setCargando(false);
     }
   };
