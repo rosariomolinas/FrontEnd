@@ -82,7 +82,7 @@ function TablaRuta({
                     onChange={(e) => onChange && onChange(i, { medica: Number(e.target.value) })}
                   >
                     <option value={0}>Sin medicación</option>
-                    {medicamentos.map((m) => <option key={m.code} value={m.code}>{m.nombre}</option>)}
+                    {medicamentos.map((m) => <option key={m.code} value={m.code ?? undefined}>{m.nombre}</option>)}
                   </Form.Select>
                 ) : ((medicamento(paso.medica) || {}).nombre || '–')}
               </td>
