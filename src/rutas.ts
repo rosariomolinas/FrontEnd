@@ -10,6 +10,7 @@ export interface OpcionMenu {
 }
 
 // Opciones del menú y perfiles que pueden acceder a cada pantalla.
+// Los permisos se controlan también en el backend: esto solo arma el menú.
 export const MENU: OpcionMenu[] = [
   {
     path: '/pacientes', titulo: 'Pacientes', grupo: 'Datos', perfiles: [USER],
@@ -21,10 +22,16 @@ export const MENU: OpcionMenu[] = [
     path: '/organos', titulo: 'Órganos', grupo: 'Datos', perfiles: [ADMIN],
   },
   {
+    path: '/medicamentos', titulo: 'Medicamentos', grupo: 'Datos', perfiles: [ADMIN],
+  },
+  {
     path: '/intervnueva', titulo: 'Nueva', grupo: 'Intervenciones', perfiles: [USER],
   },
   {
     path: '/intervbuscar', titulo: 'Buscar', grupo: 'Intervenciones', perfiles: [ADMIN, USER],
+  },
+  {
+    path: '/usuarios', titulo: 'Usuarios', grupo: 'Administración', perfiles: [ADMIN],
   },
 ];
 

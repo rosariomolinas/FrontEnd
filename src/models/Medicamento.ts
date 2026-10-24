@@ -1,19 +1,18 @@
-export interface MedicamentoJson {
-  code?: number;
-  nombre?: string;
-}
+import Entidad, { type CampoDef, type EntidadJson } from './Entidad';
 
-export default class Medicamento {
-  code: number;
+export default class Medicamento extends Entidad {
+  static campos: CampoDef[] = [
+    { nombre: 'nombre', etiqueta: 'Nombre', tipo: 'text', requerido: true },
+  ];
 
   nombre: string;
 
-  constructor({ code = 0, nombre = '' }: MedicamentoJson = {}) {
-    this.code = code;
-    this.nombre = nombre;
+  constructor(json: EntidadJson = {}) {
+    super(json);
+    this.nombre = (json.nombre as string) ?? '';
   }
 
-  static fromJson(json: unknown): Medicamento {
-    return new Medicamento((json || {}) as MedicamentoJson);
+  get nombreCompleto(): string {
+    return this.nombre;
   }
 }
