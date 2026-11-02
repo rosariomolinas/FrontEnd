@@ -15,6 +15,7 @@ import type CrudService from '../services/CrudService';
 import type Entidad from '../models/Entidad';
 import type { CampoDef, EntidadClass } from '../models/Entidad';
 import { ApiError } from '../services/apiClient';
+import { avanzarConEnter } from './avanzarConEnter';
 
 interface CrudPageProps<T extends Entidad> {
   titulo: string;
@@ -145,7 +146,7 @@ function CrudPage<T extends Entidad>({
 
       <Card>
         <Card.Body>
-          <Form onSubmit={guardar} noValidate>
+          <Form onSubmit={guardar} onKeyDown={avanzarConEnter} noValidate>
             <div className="d-flex align-items-center gap-2 mb-3">
               <span className="text-muted">
                 {entidad.code ? `Código ${entidad.code}` : `Nuevo ${etiqueta}`}

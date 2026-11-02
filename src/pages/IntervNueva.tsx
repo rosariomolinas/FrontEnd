@@ -21,6 +21,7 @@ import { ApiError } from '../services/apiClient';
 import {
   pacienteService, doctorService, medicamentoService, intervencionService,
 } from '../services';
+import { avanzarConEnter } from '../components/avanzarConEnter';
 
 // Caso de uso: planificar una intervención (paciente, médico, fecha y ruta de órganos) con su presupuesto.
 // En /intervenciones/:id se usa la misma pantalla para modificar una intervención planificada.
@@ -128,7 +129,7 @@ function IntervNueva() {
   if (cargando) return <Spinner className="d-block mx-auto my-5" />;
 
   return (
-    <section>
+    <section onKeyDown={avanzarConEnter}>
       <h1 className="h4 mb-3">{id ? 'Modificar intervención' : 'Nueva intervención'}</h1>
       <Card className="mb-3">
         <Card.Body>
@@ -163,7 +164,7 @@ function IntervNueva() {
 
       <div className="d-flex flex-wrap align-items-center gap-2">
         <Button variant="outline-primary" onClick={presupuestar}>Presupuestar</Button>
-        <Button onClick={confirmar} disabled={guardando}>{guardando ? 'Guardando…' : 'Confirmar intervención'}</Button>
+        <Button onClick={confirmar} disabled={guardando} data-enter-final>{guardando ? 'Guardando…' : 'Confirmar intervención'}</Button>
         {id && <Button variant="outline-secondary" onClick={() => navigate('/intervbuscar')}>Volver</Button>}
         {presupuesto && (
           <span className="ms-md-3">

@@ -26,6 +26,7 @@ import type Paciente from '../models/Paciente';
 import type Doctor from '../models/Doctor';
 import type Organo from '../models/Organo';
 import type Medicamento from '../models/Medicamento';
+import { avanzarConEnter } from '../components/avanzarConEnter';
 
 interface Catalogo {
   organos: Organo[];
@@ -140,7 +141,7 @@ function IntervBuscar({ usuario }: { usuario: Usuario }) {
       <h1 className="h4 mb-3">Buscar intervenciones</h1>
       <Card className="mb-3">
         <Card.Body>
-          <Form onSubmit={buscar}>
+          <Form onSubmit={buscar} onKeyDown={avanzarConEnter}>
             <Row>
               <Col xs={12} md={6}>
                 <SeleccionEntidad etiqueta="Paciente" service={pacienteService} valor={paciente} onChange={setPaciente} permitirQuitar />

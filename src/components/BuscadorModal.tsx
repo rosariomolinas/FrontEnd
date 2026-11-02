@@ -7,6 +7,7 @@ import Spinner from 'react-bootstrap/Spinner';
 import ListaErrores from './ListaErrores';
 import type CrudService from '../services/CrudService';
 import type Entidad from '../models/Entidad';
+import { avanzarConEnter } from './avanzarConEnter';
 
 interface BuscadorModalProps<T extends Entidad> {
   titulo: string;
@@ -65,7 +66,7 @@ function BuscadorModal<T extends Entidad>({
         <Modal.Title as="h2" className="h5">{titulo}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <Form onSubmit={buscar}>
+        <Form onSubmit={buscar} onKeyDown={avanzarConEnter}>
           <Form.Group className="mb-2" controlId="buscar-codigo">
             <Form.Label>Código</Form.Label>
             <Form.Control type="number" min="1" value={codigo} onChange={(e) => setCodigo(e.target.value)} />

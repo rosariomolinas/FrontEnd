@@ -10,6 +10,7 @@ import Aviso, { type AvisoState } from '../components/Aviso';
 import { usuarioService } from '../services';
 import { ApiError } from '../services/apiClient';
 import Usuario, { PERFILES, type Perfil } from '../models/Usuario';
+import { avanzarConEnter } from '../components/avanzarConEnter';
 
 const mensajesDe = (err: unknown): string[] => (
   err instanceof ApiError && err.errors.length ? err.errors : [(err as Error).message]
@@ -126,7 +127,7 @@ function Usuarios({ usuario: actual }: { usuario: Usuario }) {
 
       <Modal show={Boolean(form)} onHide={() => setForm(null)} centered>
         {form && (
-          <Form onSubmit={guardar} noValidate>
+          <Form onSubmit={guardar} onKeyDown={avanzarConEnter} noValidate>
             <Modal.Header closeButton>
               <Modal.Title as="h2" className="h5">{form.id ? `Editar ${form.user}` : 'Nuevo usuario'}</Modal.Title>
             </Modal.Header>

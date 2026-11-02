@@ -7,6 +7,7 @@ import Alert from 'react-bootstrap/Alert';
 import ListaErrores from '../components/ListaErrores';
 import { authService } from '../services';
 import type Usuario from '../models/Usuario';
+import { avanzarConEnter } from '../components/avanzarConEnter';
 
 // Input: aviso (por ejemplo, que la sesión expiró). Output: onLogin(usuario) cuando el ingreso es correcto.
 function Login({ onLogin, aviso = '' }: { onLogin: (usuario: Usuario) => void; aviso?: string }) {
@@ -38,7 +39,7 @@ function Login({ onLogin, aviso = '' }: { onLogin: (usuario: Usuario) => void; a
           <h1 className="h4 text-center mb-1">ROBIOTICS</h1>
           <p className="text-center text-muted mb-4">Ingresá con tu usuario</p>
           {aviso && <Alert variant="warning">{aviso}</Alert>}
-          <Form onSubmit={ingresar} noValidate>
+          <Form onSubmit={ingresar} onKeyDown={avanzarConEnter} noValidate>
             <Form.Group className="mb-3" controlId="login-user">
               <Form.Label>Usuario</Form.Label>
               <Form.Control autoComplete="username" value={user} onChange={(e) => setUser(e.target.value)} autoFocus />
