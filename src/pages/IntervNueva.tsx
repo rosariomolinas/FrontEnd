@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
@@ -22,7 +23,10 @@ import {
 } from '../services';
 
 // Caso de uso: planificar una intervención (paciente, médico, fecha y ruta de órganos) con su presupuesto.
+// En /intervenciones/:id se usa la misma pantalla para modificar una intervención planificada.
 function IntervNueva() {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [paciente, setPaciente] = useState<Paciente | null>(null);
   const [doctor, setDoctor] = useState<Doctor | null>(null);
   const [fecha, setFecha] = useState('');
@@ -47,7 +51,26 @@ function IntervNueva() {
       .finally(() => setCargando(false));
   }, []);
 
+  // Modificación: carga la intervención con su paciente y su médico.
+  useEffect(() => {
+    if (!id) return;
+    const cargar = async () => {
+      const interv = await intervencionService.obtener(id);
+      if (!interv.abierta) throw new Error(`La intervención está ${interv.estado} y ya no se puede modificar`);
+      const [[p], [d]] = await Promise.all([
+        pacienteService.buscarPorCodigo(interv.paciente as number, false),
+        doctorService.buscarPorCodigo(interv.doctor as number, false),
+      ]);
+      setPaciente(p || null);
+      setDoctor(d || null);
+      setFecha(interv.fecha);
+      setRuta(interv.ruta);
+    };
+    cargar().catch((err) => setErrores([err.message]));
+  }, [id]);
+
   const intervencion = () => new Intervencion({
+    _id: id,
     paciente: paciente && paciente.code,
     doctor: doctor && doctor.code,
     fecint: fecha,
@@ -85,6 +108,10 @@ function IntervNueva() {
       interv.costo = costo;
       interv.tiempo = tiempo;
       await intervencionService.guardar(interv);
+      if (id) {
+        navigate('/intervbuscar');
+        return;
+      }
       setAviso({ texto: 'Intervención guardada', variante: 'success' });
       setPaciente(null);
       setDoctor(null);
@@ -102,7 +129,7 @@ function IntervNueva() {
 
   return (
     <section>
-      <h1 className="h4 mb-3">Nueva intervención</h1>
+      <h1 className="h4 mb-3">{id ? 'Modificar intervención' : 'Nueva intervención'}</h1>
       <Card className="mb-3">
         <Card.Body>
           <Row>
@@ -137,6 +164,7 @@ function IntervNueva() {
       <div className="d-flex flex-wrap align-items-center gap-2">
         <Button variant="outline-primary" onClick={presupuestar}>Presupuestar</Button>
         <Button onClick={confirmar} disabled={guardando}>{guardando ? 'Guardando…' : 'Confirmar intervención'}</Button>
+        {id && <Button variant="outline-secondary" onClick={() => navigate('/intervbuscar')}>Volver</Button>}
         {presupuesto && (
           <span className="ms-md-3">
             Costo: <strong>${presupuesto.costo}</strong> · Tiempo: <strong>{presupuesto.tiempo} min</strong>

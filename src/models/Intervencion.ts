@@ -61,6 +61,17 @@ export interface Presupuesto {
   tiempo: number;
 }
 
+export const ESTADOS = ['planificada', 'realizada', 'cancelada'] as const;
+export type Estado = typeof ESTADOS[number];
+
+// Lo que se registra al cerrar una intervención (caso de uso "Registrar resultado").
+export interface Resultado {
+  fecha: string;
+  tiempoReal?: number;
+  observaciones?: string;
+  usuario: string;
+}
+
 export interface IntervencionJson {
   _id?: string | null;
   paciente?: number | null;
@@ -69,6 +80,8 @@ export interface IntervencionJson {
   costo?: number;
   tiempo?: number;
   ruta?: (PasoRuta | PasoRutaJson)[];
+  estado?: Estado;
+  resultado?: Resultado | null;
 }
 
 export const MAX_MEDICACIONES = 2;
@@ -88,8 +101,13 @@ export default class Intervencion {
 
   ruta: PasoRuta[];
 
+  estado: Estado;
+
+  resultado: Resultado | null;
+
   constructor({
     _id = null, paciente = null, doctor = null, fecint = '', costo = 0, tiempo = 0, ruta = [],
+    estado = 'planificada', resultado = null,
   }: IntervencionJson = {}) {
     this.id = _id;
     this.paciente = paciente;
@@ -98,6 +116,8 @@ export default class Intervencion {
     this.costo = costo;
     this.tiempo = tiempo;
     this.ruta = ruta.map((p) => (p instanceof PasoRuta ? p : new PasoRuta(p)));
+    this.estado = estado;
+    this.resultado = resultado;
   }
 
   static fromJson(json: unknown): Intervencion {
@@ -106,6 +126,11 @@ export default class Intervencion {
 
   get fecha(): string {
     return this.fecint ? String(this.fecint).substring(0, 10) : '';
+  }
+
+  // Solo una intervención planificada se puede modificar, eliminar o cerrar con un resultado.
+  get abierta(): boolean {
+    return this.estado === 'planificada';
   }
 
   // Reglas de negocio de la planificación. Devuelve los errores y el costo/tiempo estimados.

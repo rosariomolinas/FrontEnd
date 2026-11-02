@@ -25,7 +25,7 @@ function CambiarPassword({ usuario }: { usuario: Usuario }) {
     setErrores(errs);
     if (errs.length) return;
     try {
-      setAviso(await authService.cambiarPassword(usuario.user, actual, nueva));
+      setAviso(await authService.cambiarPassword(actual, nueva));
       setActual('');
       setNueva('');
       setRepetida('');
@@ -36,7 +36,8 @@ function CambiarPassword({ usuario }: { usuario: Usuario }) {
 
   return (
     <section className="contenido-angosto">
-      <h1 className="h4 mb-3">Cambiar contraseña</h1>
+      <h1 className="h4 mb-1">Cambiar contraseña</h1>
+      <p className="text-muted mb-3">Usuario: {usuario.user}</p>
       <Card>
         <Card.Body>
           <Form onSubmit={guardar} noValidate>
