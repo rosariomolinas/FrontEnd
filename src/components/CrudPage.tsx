@@ -6,6 +6,8 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Badge from 'react-bootstrap/Badge';
 import Modal from 'react-bootstrap/Modal';
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
+import Tooltip from 'react-bootstrap/Tooltip';
 import BuscadorModal from './BuscadorModal';
 import ListaErrores from './ListaErrores';
 import Aviso, { type AvisoState, type VarianteAviso } from './Aviso';
@@ -133,8 +135,12 @@ function CrudPage<T extends Entidad>({
     <section>
       <div className="d-flex flex-wrap align-items-center gap-2 mb-3">
         <h1 className="h4 mb-0 me-auto">{plural}</h1>
-        <Button variant="outline-primary" onClick={() => setVerBuscador(true)} disabled={editando}>Buscar</Button>
-        <Button onClick={nuevo} disabled={editando}>Nuevo</Button>
+        <OverlayTrigger placement="bottom" overlay={<Tooltip id="ayuda-buscar">Buscá un {etiqueta} para verlo o modificarlo</Tooltip>}>
+          <Button variant="outline-primary" onClick={() => setVerBuscador(true)} disabled={editando}>Buscar</Button>
+        </OverlayTrigger>
+        <OverlayTrigger placement="bottom" overlay={<Tooltip id="ayuda-nuevo">Cargá un {etiqueta} nuevo</Tooltip>}>
+          <Button onClick={nuevo} disabled={editando}>Nuevo</Button>
+        </OverlayTrigger>
       </div>
 
       <Card>
@@ -148,10 +154,6 @@ function CrudPage<T extends Entidad>({
                 <Badge bg={entidad.activo ? 'success' : 'secondary'}>{entidad.activo ? 'Activo' : 'De baja'}</Badge>
               )}
             </div>
-
-            {!editando && !entidad.code && (
-              <p className="text-muted">Buscá un {etiqueta} para verlo o tocá Nuevo para cargar uno.</p>
-            )}
 
             <Row>{Model.campos.map(campoInput)}</Row>
 
