@@ -7,6 +7,7 @@ import Aviso from '../components/Aviso';
 import { authService } from '../services';
 import { ApiError } from '../services/apiClient';
 import type Usuario from '../models/Usuario';
+import { avanzarConEnter } from '../components/avanzarConEnter';
 
 function CambiarPassword({ usuario }: { usuario: Usuario }) {
   const [actual, setActual] = useState('');
@@ -40,7 +41,7 @@ function CambiarPassword({ usuario }: { usuario: Usuario }) {
       <p className="text-muted mb-3">Usuario: {usuario.user}</p>
       <Card>
         <Card.Body>
-          <Form onSubmit={guardar} noValidate>
+          <Form onSubmit={guardar} onKeyDown={avanzarConEnter} noValidate>
             <Form.Group className="mb-3" controlId="pwd-actual">
               <Form.Label>Contraseña actual</Form.Label>
               <Form.Control type="password" autoComplete="current-password" value={actual} onChange={(e) => setActual(e.target.value)} />

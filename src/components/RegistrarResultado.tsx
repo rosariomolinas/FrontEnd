@@ -6,6 +6,7 @@ import ListaErrores from './ListaErrores';
 import type Intervencion from '../models/Intervencion';
 import { intervencionService, type DatosResultado } from '../services';
 import { ApiError } from '../services/apiClient';
+import { avanzarConEnter } from './avanzarConEnter';
 
 // Fecha de hoy en formato yyyy-mm-dd (hora local).
 export const hoyISO = (hoy = new Date()) => {
@@ -81,7 +82,7 @@ function RegistrarResultado({ intervencion, onClose, onRegistrado }: RegistrarRe
 
   return (
     <Modal show={Boolean(intervencion)} onHide={onClose} centered>
-      <Form onSubmit={guardar} noValidate>
+      <Form onSubmit={guardar} onKeyDown={avanzarConEnter} noValidate>
         <Modal.Header closeButton>
           <Modal.Title as="h2" className="h5">Registrar resultado</Modal.Title>
         </Modal.Header>
