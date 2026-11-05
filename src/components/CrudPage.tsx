@@ -147,14 +147,12 @@ function CrudPage<T extends Entidad>({
       <Card>
         <Card.Body>
           <Form onSubmit={guardar} onKeyDown={avanzarConEnter} noValidate>
-            <div className="d-flex align-items-center gap-2 mb-3">
-              <span className="text-muted">
-                {entidad.code ? `Código ${entidad.code}` : `Nuevo ${etiqueta}`}
-              </span>
-              {entidad.code && (
+            {entidad.code && (
+              <div className="d-flex align-items-center gap-2 mb-3">
+                <span className="text-muted">Código {entidad.code}</span>
                 <Badge bg={entidad.activo ? 'success' : 'secondary'}>{entidad.activo ? 'Activo' : 'De baja'}</Badge>
-              )}
-            </div>
+              </div>
+            )}
 
             <Row>{Model.campos.map(campoInput)}</Row>
 
