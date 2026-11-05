@@ -13,9 +13,9 @@ function NavBar({ usuario, onLogout }: { usuario: Usuario; onLogout: () => void 
   const grupos = [...new Set(opciones.map((m) => m.grupo))];
 
   return (
-    <Navbar expand="md" bg="dark" variant="dark" collapseOnSelect className="mb-3">
+    <Navbar expand="md" collapseOnSelect sticky="top" className="barra-principal mb-4">
       <Container>
-        <Navbar.Brand as={NavLink} to="/">ROBIOTICS</Navbar.Brand>
+        <Navbar.Brand as={NavLink} to="/" className="marca"><span className="marca-logo" aria-hidden="true" />Robiotics</Navbar.Brand>
         <Navbar.Toggle aria-controls="menu-principal" />
         <Navbar.Collapse id="menu-principal">
           <Nav className="me-auto">
