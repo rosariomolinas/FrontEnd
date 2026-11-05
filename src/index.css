@@ -1,19 +1,278 @@
 /*
- * Estilos propios sobre Bootstrap 5, escritos mobile-first:
+ * Estilos propios sobre Bootstrap 5.3, escritos mobile-first:
  * la base es para pantallas chicas y los media queries (min-width) agregan
  * ajustes para SM (>= 576px), MD (>= 768px) y LG (>= 992px).
+ * Los colores se definen como variables y tienen versión clara y oscura
+ * (data-bs-theme lo pone public/index.html según la preferencia del sistema).
  */
 
-:root {
-  --color-fondo: #f4f6f9;
-  --color-primario: #0d6efd;
+/* ---------- Paleta y tipografía ---------- */
+:root,
+[data-bs-theme='light'] {
+  --color-primario: #0f766e; /* verde azulado, tono "salud" */
+  --color-primario-rgb: 15, 118, 110;
+  --color-primario-hover: #115e59;
+  --color-acento: #6366f1;
+  --color-fondo: #f5f7fa;
+  --color-superficie: #ffffff;
+  --color-borde: #e5e7eb;
+  --sombra-suave: 0 1px 2px rgba(16, 24, 40, 0.04), 0 4px 16px rgba(16, 24, 40, 0.06);
+  --sombra-elevada: 0 2px 4px rgba(16, 24, 40, 0.06), 0 12px 32px rgba(16, 24, 40, 0.1);
+
+  --bs-body-font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --bs-body-bg: var(--color-fondo);
+  --bs-border-color: var(--color-borde);
+  --bs-border-radius: 0.625rem;
+  --bs-border-radius-sm: 0.5rem;
+  --bs-border-radius-lg: 1rem;
+  --bs-primary: var(--color-primario);
+  --bs-primary-rgb: var(--color-primario-rgb);
+  --bs-link-color: var(--color-primario);
+  --bs-link-color-rgb: var(--color-primario-rgb);
+  --bs-link-hover-color: var(--color-primario-hover);
+}
+
+[data-bs-theme='dark'] {
+  --color-primario: #2dd4bf;
+  --color-primario-rgb: 45, 212, 191;
+  --color-primario-hover: #5eead4;
+  --color-fondo: #0b1220;
+  --color-superficie: #111a2e;
+  --color-borde: #1f2a44;
+  --sombra-suave: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.25);
+  --sombra-elevada: 0 2px 4px rgba(0, 0, 0, 0.35), 0 12px 32px rgba(0, 0, 0, 0.4);
+
+  --bs-body-bg: var(--color-fondo);
+  --bs-border-color: var(--color-borde);
+  --bs-primary: var(--color-primario);
+  --bs-primary-rgb: var(--color-primario-rgb);
+  --bs-link-color: var(--color-primario);
+  --bs-link-color-rgb: var(--color-primario-rgb);
+  --bs-link-hover-color: var(--color-primario-hover);
 }
 
 body {
   background-color: var(--color-fondo);
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.005em;
 }
 
-/* Botones de acción: en celular ocupan todo el ancho, uno debajo del otro */
+h1, .h1, h2, .h2, h3, .h3, h4, .h4 {
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+/* ---------- Botones con el color de la marca ---------- */
+.btn {
+  font-weight: 500;
+  border-radius: var(--bs-border-radius);
+  transition: transform 0.1s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn-primary {
+  --bs-btn-bg: var(--color-primario);
+  --bs-btn-border-color: var(--color-primario);
+  --bs-btn-hover-bg: var(--color-primario-hover);
+  --bs-btn-hover-border-color: var(--color-primario-hover);
+  --bs-btn-active-bg: var(--color-primario-hover);
+  --bs-btn-active-border-color: var(--color-primario-hover);
+  --bs-btn-disabled-bg: var(--color-primario);
+  --bs-btn-disabled-border-color: var(--color-primario);
+  --bs-btn-focus-shadow-rgb: var(--color-primario-rgb);
+  box-shadow: 0 1px 2px rgba(var(--color-primario-rgb), 0.25);
+}
+
+[data-bs-theme='dark'] .btn-primary {
+  --bs-btn-color: #04201d;
+  --bs-btn-hover-color: #04201d;
+  --bs-btn-active-color: #04201d;
+  --bs-btn-disabled-color: #04201d;
+}
+
+.btn-outline-primary {
+  --bs-btn-color: var(--color-primario);
+  --bs-btn-border-color: rgba(var(--color-primario-rgb), 0.45);
+  --bs-btn-hover-bg: rgba(var(--color-primario-rgb), 0.08);
+  --bs-btn-hover-color: var(--color-primario);
+  --bs-btn-hover-border-color: var(--color-primario);
+  --bs-btn-active-bg: rgba(var(--color-primario-rgb), 0.15);
+  --bs-btn-active-color: var(--color-primario);
+  --bs-btn-active-border-color: var(--color-primario);
+  --bs-btn-disabled-color: var(--color-primario);
+  --bs-btn-disabled-border-color: rgba(var(--color-primario-rgb), 0.3);
+  --bs-btn-focus-shadow-rgb: var(--color-primario-rgb);
+}
+
+/* ---------- Formularios ---------- */
+.form-control,
+.form-select {
+  border-radius: var(--bs-border-radius);
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.form-control:focus,
+.form-select:focus,
+.form-check-input:focus {
+  border-color: var(--color-primario);
+  box-shadow: 0 0 0 0.2rem rgba(var(--color-primario-rgb), 0.18);
+}
+
+.form-check-input:checked {
+  background-color: var(--color-primario);
+  border-color: var(--color-primario);
+}
+
+.form-label {
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.form-control:disabled,
+.form-select:disabled {
+  background-color: rgba(var(--bs-secondary-rgb), 0.06);
+}
+
+/* ---------- Tarjetas, tablas, modales ---------- */
+.card {
+  background-color: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--bs-border-radius-lg);
+  box-shadow: var(--sombra-suave);
+}
+
+.card-header {
+  background: transparent;
+  border-bottom-color: var(--color-borde);
+  font-weight: 600;
+  padding: 0.85rem 1.25rem;
+}
+
+.card-body {
+  padding: 1.25rem;
+}
+
+.table {
+  --bs-table-bg: var(--color-superficie);
+  --bs-table-hover-bg: rgba(var(--color-primario-rgb), 0.06);
+}
+
+.table > thead th {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--bs-secondary-color);
+  border-bottom-width: 1px;
+}
+
+/* Tablas de resultados con aspecto de tarjeta */
+.table-responsive > .table,
+.tabla-seleccion {
+  border: 1px solid var(--color-borde);
+  border-radius: var(--bs-border-radius-lg);
+  overflow: hidden;
+  border-collapse: separate;
+  border-spacing: 0;
+  box-shadow: var(--sombra-suave);
+}
+
+.table > :last-child > tr:last-child > * {
+  border-bottom: 0;
+}
+
+.modal-content {
+  border: 1px solid var(--color-borde);
+  border-radius: var(--bs-border-radius-lg);
+  box-shadow: var(--sombra-elevada);
+}
+
+.modal-backdrop.show {
+  opacity: 0.35;
+  backdrop-filter: blur(2px);
+}
+
+.badge {
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 0.35em 0.7em;
+}
+
+.alert {
+  border-radius: var(--bs-border-radius);
+}
+
+.toast {
+  border-radius: var(--bs-border-radius);
+  box-shadow: var(--sombra-elevada);
+}
+
+/* ---------- Barra de navegación ---------- */
+.barra-principal {
+  background-color: rgba(var(--bs-body-bg-rgb), 0.75);
+  -webkit-backdrop-filter: saturate(180%) blur(12px);
+  backdrop-filter: saturate(180%) blur(12px);
+  border-bottom: 1px solid var(--color-borde);
+}
+
+.barra-principal .nav-link {
+  font-weight: 500;
+  border-radius: var(--bs-border-radius-sm);
+}
+
+.barra-principal .nav-link:hover,
+.barra-principal .nav-link.show {
+  background-color: rgba(var(--color-primario-rgb), 0.08);
+}
+
+.dropdown-menu {
+  border: 1px solid var(--color-borde);
+  border-radius: var(--bs-border-radius);
+  box-shadow: var(--sombra-elevada);
+  padding: 0.35rem;
+}
+
+.dropdown-item {
+  border-radius: var(--bs-border-radius-sm);
+  padding: 0.45rem 0.75rem;
+}
+
+.dropdown-item.active,
+.dropdown-item:active {
+  background-color: var(--color-primario);
+}
+
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* Logo simple hecho con CSS: un cuadrado redondeado con degradado */
+.marca-logo {
+  display: inline-block;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 0.5rem;
+  background: linear-gradient(135deg, var(--color-primario), var(--color-acento));
+  box-shadow: 0 2px 8px rgba(var(--color-primario-rgb), 0.35);
+}
+
+.marca-logo-grande {
+  display: block;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.9rem;
+}
+
+/* ---------- Botones de acción ---------- */
+/* En celular ocupan todo el ancho, uno debajo del otro */
 .botonera {
   display: flex;
   flex-direction: column;
@@ -29,29 +288,72 @@ body {
   min-width: 9rem;
 }
 
+/* ---------- Login ---------- */
 .pantalla-login {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 1rem;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(var(--color-primario-rgb), 0.18), transparent 45%),
+    radial-gradient(circle at 85% 80%, rgba(99, 102, 241, 0.16), transparent 45%),
+    var(--color-fondo);
 }
 
 .tarjeta-login {
   width: 100%;
+  box-shadow: var(--sombra-elevada);
 }
 
+.tarjeta-login .card-body {
+  padding: 2rem 1.5rem;
+}
+
+/* ---------- Inicio ---------- */
 .tarjeta-acceso {
-  transition: box-shadow 0.15s ease-in-out;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
 .tarjeta-acceso:hover,
-.tarjeta-acceso:focus {
-  box-shadow: 0 0.25rem 0.75rem rgba(13, 110, 253, 0.25);
+.tarjeta-acceso:focus-visible {
+  transform: translateY(-2px);
+  border-color: rgba(var(--color-primario-rgb), 0.5);
+  box-shadow: var(--sombra-elevada);
+}
+
+.tarjeta-acceso .card-title {
+  color: var(--bs-emphasis-color);
+  font-weight: 600;
+}
+
+.etiqueta-grupo {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-primario);
+  background-color: rgba(var(--color-primario-rgb), 0.1);
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
 }
 
 .contenido-angosto {
   width: 100%;
+}
+
+/* Respeta a quien pide menos animaciones */
+@media (prefers-reduced-motion: reduce) {
+  .btn,
+  .tarjeta-acceso {
+    transition: none;
+  }
+
+  .tarjeta-acceso:hover,
+  .tarjeta-acceso:focus-visible {
+    transform: none;
+  }
 }
 
 /* SM */
@@ -62,7 +364,11 @@ body {
   }
 
   .tarjeta-login {
-    max-width: 400px;
+    max-width: 420px;
+  }
+
+  .tarjeta-login .card-body {
+    padding: 2.5rem 2rem;
   }
 }
 

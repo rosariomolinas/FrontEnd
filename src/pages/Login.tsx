@@ -34,9 +34,10 @@ function Login({ onLogin, aviso = '' }: { onLogin: (usuario: Usuario) => void; a
 
   return (
     <main className="pantalla-login">
-      <Card className="tarjeta-login shadow-sm">
+      <Card className="tarjeta-login">
         <Card.Body>
-          <h1 className="h4 text-center mb-1">ROBIOTICS</h1>
+          <div className="marca-logo marca-logo-grande mx-auto mb-3" aria-hidden="true" />
+          <h1 className="h4 text-center mb-1">Robiotics</h1>
           <p className="text-center text-muted mb-4">Ingresá con tu usuario</p>
           {aviso && <Alert variant="warning">{aviso}</Alert>}
           <Form onSubmit={ingresar} onKeyDown={avanzarConEnter} noValidate>

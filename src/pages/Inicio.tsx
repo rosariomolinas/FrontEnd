@@ -9,14 +9,18 @@ function Inicio({ usuario }: { usuario: Usuario }) {
   const opciones = MENU.filter((m) => usuario.tienePerfil(m.perfiles));
   return (
     <section>
-      <h1 className="h4 mb-3">Hola, {usuario.user}</h1>
+      <header className="mb-4">
+        <h1 className="h3 mb-1">Hola, {usuario.user}</h1>
+        <p className="text-body-secondary mb-0">¿Qué querés hacer hoy?</p>
+      </header>
       <Row xs={1} sm={2} lg={3} className="g-3">
         {opciones.map((m) => (
           <Col key={m.path}>
             <Card as={Link} to={m.path} className="tarjeta-acceso h-100 text-decoration-none">
               <Card.Body>
-                <Card.Subtitle className="text-muted mb-1">{m.grupo}</Card.Subtitle>
-                <Card.Title className="mb-0">{m.titulo}</Card.Title>
+                <span className="etiqueta-grupo mb-2">{m.grupo}</span>
+                <Card.Title className="mb-1">{m.titulo}</Card.Title>
+                <Card.Text className="text-body-secondary small mb-0">{m.descripcion}</Card.Text>
               </Card.Body>
             </Card>
           </Col>
